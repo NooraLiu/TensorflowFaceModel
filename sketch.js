@@ -1,10 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// =============================================================================
-// UTILITY FUNCTIONS
-// =============================================================================
-
+// Error handling function
 function showError(message) {
   console.error(message);
   const errorDiv = document.getElementById('error');
@@ -12,30 +9,19 @@ function showError(message) {
   errorDiv.style.display = 'block';
 }
 
-// =============================================================================
-// THREE.JS SETUP
-// =============================================================================
-
-// Scene setup
+// Three.js setup
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x222222);
 
-// Camera setup
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 camera.position.z = 2;
 
-// Renderer setup
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Controls setup
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-
-// =============================================================================
-// CALIBRATION SYSTEM
-// =============================================================================
 
 // Eyebrow baseline calibration
 let eyebrowBaseline = null;
@@ -52,25 +38,23 @@ let headRollReadings = [];
 const CALIBRATION_SAMPLES = 30; // Number of samples for baseline
 let isCalibrated = false;
 
-// =============================================================================
-// BLINK DETECTION SYSTEM
-// =============================================================================
-
 // Blink detection variables
 let blinkCircles = []; // Array to store blink-triggered circles
 let lastBlinkState = { left: false, right: false }; // Track previous blink state
 let lastBlinkTime = 0; // Track when last blink was detected
 const BLINK_THRESHOLD = 0.25; // Eye aspect ratio threshold for blink detection (height/width)
-const BLINK_COOLDOWN = 150; // Minimum milliseconds between blink detections
+const BLINK_COOLDOWN = 150; // Minimum milliseconds between blink detections (increased)
 
-// =============================================================================
-// 3D CUBE SETUP
-// =============================================================================
+// Mouth smoothing variables
+let mouthOpenHistory = []; // Rolling history of mouth openness values
+const MOUTH_HISTORY_SIZE = 8; // Number of frames to track for smoothing
+const MOUTH_CHANGE_THRESHOLD = 0.4; // Maximum allowed change between frames
+let lastSmoothedMouthValue = 1.0; // Track previous smoothed value
 
-// Create cube geometry
+// Add cube with different colors on each face
 const geometry = new THREE.BoxGeometry();
 
-// Create materials for each face of the cube with distinct colors
+// Create materials for each face of the cube
 const materials = [
   new THREE.MeshBasicMaterial({ color: 0xff0000 }), // Right face - Red
   new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Left face - Green  
@@ -80,19 +64,15 @@ const materials = [
   new THREE.MeshBasicMaterial({ color: 0x00ffff })  // Back face - Cyan
 ];
 
-// Create cube mesh and add to scene
 const cube = new THREE.Mesh(geometry, materials);
 scene.add(cube);
 
-// Add directional lighting
+// Lighting (optional)
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(1,1,1);
 scene.add(light);
 
-// =============================================================================
-// MEDIAPIPE INITIALIZATION
-// =============================================================================
-
+// Wait for MediaPipe to load and initialize
 function initializeMediaPipe() {
   // Check if MediaPipe libraries are loaded
   if (typeof FaceMesh === 'undefined' || typeof Camera === 'undefined') {
@@ -110,7 +90,7 @@ function initializeMediaPipe() {
   }
 
   try {
-    // Configure MediaPipe FaceMesh
+    // MediaPipe FaceMesh setup
     const faceMesh = new FaceMesh({locateFile: (file) => {
       return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
     }});
@@ -124,7 +104,7 @@ function initializeMediaPipe() {
 
     faceMesh.onResults((results) => onResults(results, meshCtx, meshCanvas));
 
-    // Initialize camera
+    // Start camera
     const cameraUtils = new Camera(videoElement, {
       onFrame: async () => { 
         try {
@@ -146,10 +126,7 @@ function initializeMediaPipe() {
   }
 }
 
-// =============================================================================
-// MAIN FACE PROCESSING FUNCTION
-// =============================================================================
-
+// Handle face mesh results
 function onResults(results, meshCtx, meshCanvas) {
   // Clear the canvas
   meshCtx.clearRect(0, 0, meshCanvas.width, meshCanvas.height);
@@ -159,333 +136,222 @@ function onResults(results, meshCtx, meshCanvas) {
   try {
     const landmarks = results.multiFaceLandmarks[0];
 
-    // Draw face mesh visualization
+    // Draw face mesh
     drawFaceMesh(meshCtx, landmarks, meshCanvas.width, meshCanvas.height);
 
-    // Extract key facial landmarks
-    const landmarkData = extractLandmarks(landmarks);
+    // Simple head yaw estimation for cube control
+    const left = landmarks[234];  // approximate left side of face
+    const right = landmarks[454]; // approximate right side of face
+    const nose = landmarks[1];    // nose tip
+
+    // Mouth openness detection
+    const upperLip = landmarks[13];   // upper lip center
+    const lowerLip = landmarks[14];   // lower lip center
+    const lipCornerLeft = landmarks[61];  // left corner of mouth
+    const lipCornerRight = landmarks[291]; // right corner of mouth
+
+    // Eyebrow position detection (distance from eyebrow bottom to head top)
+    const leftEyebrowBottom = landmarks[55];  // left eyebrow bottom edge
+    const rightEyebrowBottom = landmarks[285]; // right eyebrow bottom edge  
+    const headTop = landmarks[10];            // top of the head/forehead
     
-    if (!landmarkData) return;
-    
-    // Perform blink detection
-    detectBlinks(landmarkData);
-    
-    // Handle calibration phase
-    if (!isCalibrated) {
-      handleCalibration(landmarkData);
-      return;
+    // Get reference points for head orientation normalization
+    const leftEye = landmarks[33];   // left eye inner corner
+    const rightEye = landmarks[362]; // right eye inner corner
+
+    // Blink detection using eye landmarks
+    const leftEyeTop = landmarks[159];    // left eye top
+    const leftEyeBottom = landmarks[145]; // left eye bottom
+    const rightEyeTop = landmarks[386];   // right eye top
+    const rightEyeBottom = landmarks[374]; // right eye bottom
+
+    if (left && right && nose && upperLip && lowerLip && lipCornerLeft && lipCornerRight && 
+        leftEyebrowBottom && rightEyebrowBottom && headTop &&
+        leftEye && rightEye && leftEyeTop && leftEyeBottom && rightEyeTop && rightEyeBottom) {
+      
+      // Calculate eye aspect ratios for blink detection
+      const leftEyeHeight = Math.abs(leftEyeTop.y - leftEyeBottom.y);
+      const rightEyeHeight = Math.abs(rightEyeTop.y - rightEyeBottom.y);
+      
+      // Calculate individual eye widths for proper aspect ratios
+      const leftEyeLeft = landmarks[33];   // left eye inner corner
+      const leftEyeRight = landmarks[133]; // left eye outer corner
+      const rightEyeLeft = landmarks[362]; // right eye inner corner  
+      const rightEyeRight = landmarks[263]; // right eye outer corner
+      
+      const leftEyeWidth = Math.abs(leftEyeRight.x - leftEyeLeft.x);
+      const rightEyeWidth = Math.abs(rightEyeRight.x - rightEyeLeft.x);
+      
+      // Calculate proper eye aspect ratios (height/width for each eye)
+      const leftEyeRatio = leftEyeHeight / leftEyeWidth;
+      const rightEyeRatio = rightEyeHeight / rightEyeWidth;
+      
+      // Simple and reliable blink detection
+      const leftBlink = leftEyeRatio < BLINK_THRESHOLD;
+      const rightBlink = rightEyeRatio < BLINK_THRESHOLD;
+      const bothEyesBlink = leftBlink && rightBlink;
+      
+      // Trigger only on transition from open to closed
+      const wasOpen = !lastBlinkState.left && !lastBlinkState.right;
+      const nowClosed = bothEyesBlink;
+      const currentTime = Date.now();
+      
+      if (nowClosed && wasOpen && (currentTime - lastBlinkTime) > BLINK_COOLDOWN) {
+        createBlinkCircle();
+        lastBlinkTime = currentTime;
+        console.log('Blink detected! L:', leftEyeRatio.toFixed(3), 'R:', rightEyeRatio.toFixed(3));
+      }
+      
+      // Update state for next frame
+      lastBlinkState.left = leftBlink;
+      lastBlinkState.right = rightBlink;
+      // horizontal head angle (relative to nose position)
+      const leftRelativeToNose = left.x - nose.x;   // negative when face turns right
+      const rightRelativeToNose = right.x - nose.x; // negative when face turns left
+      
+      // vertical head angle (relative to nose position)
+      const leftVerticalToNose = left.y - nose.y;   // negative when head tilts up
+      const rightVerticalToNose = right.y - nose.y; // negative when head tilts up
+
+      // Head roll detection (side-to-side tilting) using eye positions
+      const leftEyeInner = landmarks[33];   // left eye inner corner
+      const rightEyeInner = landmarks[362]; // right eye inner corner
+      
+      // Calculate the angle between the eyes to detect head roll
+      const eyeDeltaX = rightEyeInner.x - leftEyeInner.x;
+      const eyeDeltaY = rightEyeInner.y - leftEyeInner.y;
+      const rawHeadRollAngle = Math.atan2(eyeDeltaY, eyeDeltaX); // Angle in radians
+
+      // Calculate raw head angles
+      const rawHeadTurnAngle = (rightRelativeToNose + leftRelativeToNose) / 2; // Average gives turn direction
+      const rawHeadTiltAngle = (leftVerticalToNose + rightVerticalToNose) / 2; // Average gives tilt direction
+
+      // Calculate mouth openness
+      const mouthHeight = Math.abs(lowerLip.y - upperLip.y);
+      const mouthWidth = Math.abs(lipCornerRight.x - lipCornerLeft.x);
+      
+      // Normalize mouth openness (adjust these values based on your preference)
+      const rawMouthOpen = Math.min(mouthHeight / (mouthWidth * 0.3), 3.0); // Cap at 3x size
+      
+      // Apply smoothing to filter out abrupt changes
+      const smoothedMouthOpen = smoothMouthOpening(rawMouthOpen);
+      const cubeScale = Math.max(0.3, smoothedMouthOpen); // Minimum size of 0.3
+      
+      // Apply scale to cube
+      cube.scale.setScalar(cubeScale);
+
+      // Calculate eyebrow-to-head distance (normalized for head tilt)
+      // Use the distance between eyes as a reference for normalization
+      const eyeDistance = Math.sqrt(
+        Math.pow(rightEye.x - leftEye.x, 2) + 
+        Math.pow(rightEye.y - leftEye.y, 2)
+      );
+      
+      // Calculate the distance from eyebrow bottom to head top, normalized by eye distance
+      const leftEyebrowToHead = Math.abs(leftEyebrowBottom.y - headTop.y) / eyeDistance;
+      const rightEyebrowToHead = Math.abs(rightEyebrowBottom.y - headTop.y) / eyeDistance;
+      const avgEyebrowToHead = (leftEyebrowToHead + rightEyebrowToHead) / 2;
+      
+      // Calibrate baseline positions (eyebrows and head)
+      if (!isCalibrated) {
+        eyebrowReadings.push(avgEyebrowToHead);
+        headTurnReadings.push(rawHeadTurnAngle);
+        headTiltReadings.push(rawHeadTiltAngle);
+        headRollReadings.push(rawHeadRollAngle);
+        
+        // Update calibration status
+        const statusDiv = document.getElementById('calibration-status');
+        if (statusDiv) {
+          const progress = Math.round((eyebrowReadings.length / CALIBRATION_SAMPLES) * 100);
+          statusDiv.textContent = `🔧 Calibrating face baseline... ${progress}%`;
+        }
+        
+        if (eyebrowReadings.length >= CALIBRATION_SAMPLES) {
+          // Use median of readings for more stable baseline
+          eyebrowReadings.sort((a, b) => a - b);
+          headTurnReadings.sort((a, b) => a - b);
+          headTiltReadings.sort((a, b) => a - b);
+          headRollReadings.sort((a, b) => a - b);
+          
+          eyebrowBaseline = eyebrowReadings[Math.floor(eyebrowReadings.length / 2)];
+          headTurnBaseline = headTurnReadings[Math.floor(headTurnReadings.length / 2)];
+          headTiltBaseline = headTiltReadings[Math.floor(headTiltReadings.length / 2)];
+          headRollBaseline = headRollReadings[Math.floor(headRollReadings.length / 2)];
+          
+          isCalibrated = true;
+          console.log('Baselines calibrated:', {
+            eyebrow: eyebrowBaseline,
+            headTurn: headTurnBaseline,
+            headTilt: headTiltBaseline,
+            headRoll: headRollBaseline
+          });
+          
+          // Update UI to show calibration complete
+          if (statusDiv) {
+            statusDiv.textContent = '✅ Face baseline calibrated!';
+            statusDiv.style.color = '#00FF00';
+          }
+        }
+        // During calibration, keep cube neutral
+        cube.rotation.y = 0;
+        cube.rotation.x = 0;
+        // Set all faces to solid, colored mode
+        cube.material.forEach(mat => {
+          mat.wireframe = false;
+        });
+        return;
+      }
+      
+      // Calculate relative movements from baselines
+      const headTurnAngle = (rawHeadTurnAngle - headTurnBaseline) * Math.PI * 4; // Relative to neutral
+      const headTiltAngle = (rawHeadTiltAngle - headTiltBaseline) * Math.PI * 4; // Relative to neutral
+      const headRollAngle = (rawHeadRollAngle - headRollBaseline) * 2; // Side-to-side tilt
+
+      cube.rotation.y = headTurnAngle; // rotate cube based on relative face turn
+      cube.rotation.x = headTiltAngle; // tilt cube based on relative head tilt
+      cube.rotation.z = headRollAngle; // roll cube based on relative head roll
+      
+      // Calculate relative eyebrow movement from baseline
+      const eyebrowMovement = eyebrowBaseline - avgEyebrowToHead; // Reversed: baseline minus current
+      
+      // Check for symmetrical eyebrow movement (filter out head tilts)
+      const eyebrowAsymmetry = Math.abs(leftEyebrowToHead - rightEyebrowToHead);
+      const isSymmetrical = eyebrowAsymmetry < 0.3; // Allow some natural asymmetry
+      
+      const eyebrowIntensity = Math.max(0, Math.min(eyebrowMovement * 50, 1.0)); // Adjusted multiplier
+      
+      // Use eyebrow movement to control cube wireframe (only if movement is symmetrical)
+      if (eyebrowIntensity > 0.91 && isSymmetrical) {
+        // Eyebrows raised symmetrically - change to wireframe
+        cube.material.forEach(mat => {
+          mat.wireframe = true;
+        });
+      } else {
+        // Neutral eyebrows or asymmetrical movement - normal solid colored faces
+        cube.material.forEach(mat => {
+          mat.wireframe = false;
+        });
+      }
     }
-    
-    // Apply face-controlled movements to cube
-    applyHeadMovements(landmarkData);
-    applyMouthControl(landmarkData);
-    applyEyebrowControl(landmarkData);
-    
   } catch (error) {
     console.error('Error processing face landmarks:', error);
   }
 }
 
-// =============================================================================
-// LANDMARK EXTRACTION
-// =============================================================================
-
-function extractLandmarks(landmarks) {
-  // Face orientation points
-  const left = landmarks[234];
-  const right = landmarks[454];
-  const nose = landmarks[1];
-
-  // Mouth points
-  const upperLip = landmarks[13];
-  const lowerLip = landmarks[14];
-  const lipCornerLeft = landmarks[61];
-  const lipCornerRight = landmarks[291];
-
-  // Eyebrow points
-  const leftEyebrowBottom = landmarks[55];
-  const rightEyebrowBottom = landmarks[285];
-  const headTop = landmarks[10];
-  
-  // Eye reference points
-  const leftEye = landmarks[33];
-  const rightEye = landmarks[362];
-
-  // Blink detection points
-  const leftEyeTop = landmarks[159];
-  const leftEyeBottom = landmarks[145];
-  const rightEyeTop = landmarks[386];
-  const rightEyeBottom = landmarks[374];
-  
-  // Eye width points
-  const leftEyeLeft = landmarks[33];
-  const leftEyeRight = landmarks[133];
-  const rightEyeLeft = landmarks[362];
-  const rightEyeRight = landmarks[263];
-  
-  // Head roll detection points
-  const leftEyeInner = landmarks[33];
-  const rightEyeInner = landmarks[362];
-
-  // Check if all required landmarks are available
-  const requiredPoints = [
-    left, right, nose, upperLip, lowerLip, lipCornerLeft, lipCornerRight,
-    leftEyebrowBottom, rightEyebrowBottom, headTop, leftEye, rightEye,
-    leftEyeTop, leftEyeBottom, rightEyeTop, rightEyeBottom,
-    leftEyeLeft, leftEyeRight, rightEyeLeft, rightEyeRight,
-    leftEyeInner, rightEyeInner
-  ];
-  
-  if (requiredPoints.some(point => !point)) {
-    return null;
-  }
-  
-  return {
-    face: { left, right, nose },
-    mouth: { upperLip, lowerLip, lipCornerLeft, lipCornerRight },
-    eyebrows: { leftEyebrowBottom, rightEyebrowBottom, headTop },
-    eyes: {
-      reference: { leftEye, rightEye },
-      blink: {
-        leftTop: leftEyeTop, leftBottom: leftEyeBottom,
-        rightTop: rightEyeTop, rightBottom: rightEyeBottom
-      },
-      width: {
-        leftLeft: leftEyeLeft, leftRight: leftEyeRight,
-        rightLeft: rightEyeLeft, rightRight: rightEyeRight
-      },
-      inner: { leftEyeInner, rightEyeInner }
-    }
-  };
-}
-
-// =============================================================================
-// BLINK DETECTION
-// =============================================================================
-
-function detectBlinks(landmarkData) {
-  const { eyes } = landmarkData;
-  
-  // Calculate eye heights
-  const leftEyeHeight = Math.abs(eyes.blink.leftTop.y - eyes.blink.leftBottom.y);
-  const rightEyeHeight = Math.abs(eyes.blink.rightTop.y - eyes.blink.rightBottom.y);
-  
-  // Calculate eye widths
-  const leftEyeWidth = Math.abs(eyes.width.leftRight.x - eyes.width.leftLeft.x);
-  const rightEyeWidth = Math.abs(eyes.width.rightRight.x - eyes.width.rightLeft.x);
-  
-  // Calculate eye aspect ratios (height/width)
-  const leftEyeRatio = leftEyeHeight / leftEyeWidth;
-  const rightEyeRatio = rightEyeHeight / rightEyeWidth;
-  
-  // Detect blinks when both eyes close
-  const leftBlink = leftEyeRatio < BLINK_THRESHOLD;
-  const rightBlink = rightEyeRatio < BLINK_THRESHOLD;
-  const bothEyesBlink = leftBlink && rightBlink;
-  
-  // Trigger only on transition from open to closed
-  const wasOpen = !lastBlinkState.left && !lastBlinkState.right;
-  const nowClosed = bothEyesBlink;
-  const currentTime = Date.now();
-  
-  if (nowClosed && wasOpen && (currentTime - lastBlinkTime) > BLINK_COOLDOWN) {
-    createBlinkCircle();
-    lastBlinkTime = currentTime;
-    console.log('Blink detected! L:', leftEyeRatio.toFixed(3), 'R:', rightEyeRatio.toFixed(3));
-  }
-  
-  // Update state for next frame
-  lastBlinkState.left = leftBlink;
-  lastBlinkState.right = rightBlink;
-}
-
-// =============================================================================
-// CALIBRATION SYSTEM
-// =============================================================================
-
-function handleCalibration(landmarkData) {
-  const { face, eyebrows, eyes } = landmarkData;
-  
-  // Calculate baseline measurements
-  const eyeDistance = Math.sqrt(
-    Math.pow(eyes.reference.rightEye.x - eyes.reference.leftEye.x, 2) + 
-    Math.pow(eyes.reference.rightEye.y - eyes.reference.leftEye.y, 2)
-  );
-  
-  const leftEyebrowToHead = Math.abs(eyebrows.leftEyebrowBottom.y - eyebrows.headTop.y) / eyeDistance;
-  const rightEyebrowToHead = Math.abs(eyebrows.rightEyebrowBottom.y - eyebrows.headTop.y) / eyeDistance;
-  const avgEyebrowToHead = (leftEyebrowToHead + rightEyebrowToHead) / 2;
-  
-  // Head angle calculations
-  const leftRelativeToNose = face.left.x - face.nose.x;
-  const rightRelativeToNose = face.right.x - face.nose.x;
-  const leftVerticalToNose = face.left.y - face.nose.y;
-  const rightVerticalToNose = face.right.y - face.nose.y;
-  
-  const rawHeadTurnAngle = (rightRelativeToNose + leftRelativeToNose) / 2;
-  const rawHeadTiltAngle = (leftVerticalToNose + rightVerticalToNose) / 2;
-  
-  const eyeDeltaX = eyes.inner.rightEyeInner.x - eyes.inner.leftEyeInner.x;
-  const eyeDeltaY = eyes.inner.rightEyeInner.y - eyes.inner.leftEyeInner.y;
-  const rawHeadRollAngle = Math.atan2(eyeDeltaY, eyeDeltaX);
-  
-  // Collect calibration samples
-  eyebrowReadings.push(avgEyebrowToHead);
-  headTurnReadings.push(rawHeadTurnAngle);
-  headTiltReadings.push(rawHeadTiltAngle);
-  headRollReadings.push(rawHeadRollAngle);
-  
-  // Update calibration progress
-  const statusDiv = document.getElementById('calibration-status');
-  if (statusDiv) {
-    const progress = Math.round((eyebrowReadings.length / CALIBRATION_SAMPLES) * 100);
-    statusDiv.textContent = `Calibrating face baseline... ${progress}%`;
-  }
-  
-  // Complete calibration when enough samples collected
-  if (eyebrowReadings.length >= CALIBRATION_SAMPLES) {
-    // Use median of readings for stable baseline
-    eyebrowReadings.sort((a, b) => a - b);
-    headTurnReadings.sort((a, b) => a - b);
-    headTiltReadings.sort((a, b) => a - b);
-    headRollReadings.sort((a, b) => a - b);
-    
-    eyebrowBaseline = eyebrowReadings[Math.floor(eyebrowReadings.length / 2)];
-    headTurnBaseline = headTurnReadings[Math.floor(headTurnReadings.length / 2)];
-    headTiltBaseline = headTiltReadings[Math.floor(headTiltReadings.length / 2)];
-    headRollBaseline = headRollReadings[Math.floor(headRollReadings.length / 2)];
-    
-    isCalibrated = true;
-    console.log('Baselines calibrated:', {
-      eyebrow: eyebrowBaseline,
-      headTurn: headTurnBaseline,
-      headTilt: headTiltBaseline,
-      headRoll: headRollBaseline
-    });
-    
-    // Update UI to show calibration complete
-    if (statusDiv) {
-      statusDiv.textContent = 'Face baseline calibrated!';
-      statusDiv.style.color = '#00FF00';
-    }
-  }
-  
-  // Keep cube neutral during calibration
-  cube.rotation.y = 0;
-  cube.rotation.x = 0;
-  cube.rotation.z = 0;
-  cube.material.forEach(mat => {
-    mat.wireframe = false;
-  });
-}
-
-// =============================================================================
-// HEAD MOVEMENT DETECTION AND CONTROL
-// =============================================================================
-
-function applyHeadMovements(landmarkData) {
-  const { face, eyes } = landmarkData;
-  
-  // Calculate raw head angles
-  const leftRelativeToNose = face.left.x - face.nose.x;
-  const rightRelativeToNose = face.right.x - face.nose.x;
-  const leftVerticalToNose = face.left.y - face.nose.y;
-  const rightVerticalToNose = face.right.y - face.nose.y;
-  
-  const rawHeadTurnAngle = (rightRelativeToNose + leftRelativeToNose) / 2;
-  const rawHeadTiltAngle = (leftVerticalToNose + rightVerticalToNose) / 2;
-  
-  // Head roll detection using eye positions
-  const eyeDeltaX = eyes.inner.rightEyeInner.x - eyes.inner.leftEyeInner.x;
-  const eyeDeltaY = eyes.inner.rightEyeInner.y - eyes.inner.leftEyeInner.y;
-  const rawHeadRollAngle = Math.atan2(eyeDeltaY, eyeDeltaX);
-  
-  // Calculate relative movements from calibrated baselines
-  const headTurnAngle = (rawHeadTurnAngle - headTurnBaseline) * Math.PI * 4;
-  const headTiltAngle = (rawHeadTiltAngle - headTiltBaseline) * Math.PI * 4;
-  const headRollAngle = (rawHeadRollAngle - headRollBaseline) * 2;
-  
-  // Apply rotations to cube
-  cube.rotation.y = headTurnAngle; // Left/right head turn
-  cube.rotation.x = headTiltAngle; // Up/down head tilt
-  cube.rotation.z = headRollAngle; // Side-to-side head roll
-}
-
-// =============================================================================
-// MOUTH CONTROL (SCALING)
-// =============================================================================
-
-function applyMouthControl(landmarkData) {
-  const { mouth } = landmarkData;
-  
-  // Calculate mouth dimensions
-  const mouthHeight = Math.abs(mouth.lowerLip.y - mouth.upperLip.y);
-  const mouthWidth = Math.abs(mouth.lipCornerRight.x - mouth.lipCornerLeft.x);
-  
-  // Normalize mouth openness and apply to cube scale
-  const normalizedMouthOpen = Math.min(mouthHeight / (mouthWidth * 0.3), 3.0);
-  const cubeScale = Math.max(0.3, normalizedMouthOpen);
-  
-  cube.scale.setScalar(cubeScale);
-}
-
-// =============================================================================
-// EYEBROW CONTROL (WIREFRAME MODE)
-// =============================================================================
-
-function applyEyebrowControl(landmarkData) {
-  const { eyebrows, eyes } = landmarkData;
-  
-  // Calculate normalized eyebrow distance
-  const eyeDistance = Math.sqrt(
-    Math.pow(eyes.reference.rightEye.x - eyes.reference.leftEye.x, 2) + 
-    Math.pow(eyes.reference.rightEye.y - eyes.reference.leftEye.y, 2)
-  );
-  
-  const leftEyebrowToHead = Math.abs(eyebrows.leftEyebrowBottom.y - eyebrows.headTop.y) / eyeDistance;
-  const rightEyebrowToHead = Math.abs(eyebrows.rightEyebrowBottom.y - eyebrows.headTop.y) / eyeDistance;
-  const avgEyebrowToHead = (leftEyebrowToHead + rightEyebrowToHead) / 2;
-  
-  // Calculate relative eyebrow movement from baseline
-  const eyebrowMovement = eyebrowBaseline - avgEyebrowToHead;
-  
-  // Check for symmetrical eyebrow movement (filter out head tilts)
-  const eyebrowAsymmetry = Math.abs(leftEyebrowToHead - rightEyebrowToHead);
-  const isSymmetrical = eyebrowAsymmetry < 0.3;
-  
-  const eyebrowIntensity = Math.max(0, Math.min(eyebrowMovement * 50, 1.0));
-  
-  // Control wireframe mode based on eyebrow raises
-  if (eyebrowIntensity > 0.91 && isSymmetrical) {
-    // Eyebrows raised symmetrically - enable wireframe
-    cube.material.forEach(mat => {
-      mat.wireframe = true;
-    });
-  } else {
-    // Normal state - solid colored faces
-    cube.material.forEach(mat => {
-      mat.wireframe = false;
-    });
-  }
-}
-
-// =============================================================================
-// BLINK CIRCLE EFFECTS
-// =============================================================================
-
+// Blink circle functions
 function createBlinkCircle() {
-  // Create a new circle with random properties
+  // Create a new circle at random position
   const circle = {
     geometry: new THREE.CircleGeometry(0.1, 32),
     material: new THREE.MeshBasicMaterial({ 
-      color: Math.random() * 0xffffff,
+      color: Math.random() * 0xffffff, // Random color
       transparent: true,
       opacity: 1.0
     }),
     position: {
-      x: (Math.random() - 0.5) * 4,
-      y: (Math.random() - 0.5) * 4,
-      z: (Math.random() - 0.5) * 2
+      x: (Math.random() - 0.5) * 4, // Random X between -2 and 2
+      y: (Math.random() - 0.5) * 4, // Random Y between -2 and 2
+      z: (Math.random() - 0.5) * 2  // Random Z between -1 and 1
     },
     age: 0,
     maxAge: 180 // Fade out over 3 seconds (60fps * 3)
@@ -496,7 +362,7 @@ function createBlinkCircle() {
   circle.mesh.position.set(circle.position.x, circle.position.y, circle.position.z);
   scene.add(circle.mesh);
   
-  // Add to tracking array
+  // Add to array
   blinkCircles.push(circle);
   
   console.log('Blink detected! Circle created at:', circle.position);
@@ -512,7 +378,7 @@ function updateBlinkCircles() {
     const fadeProgress = circle.age / circle.maxAge;
     circle.material.opacity = Math.max(0, 1 - fadeProgress);
     
-    // Make circles slowly rise
+    // Optional: Make them slowly rise
     circle.mesh.position.y += 0.005;
     
     // Remove when fully faded
@@ -525,17 +391,77 @@ function updateBlinkCircles() {
   }
 }
 
-// =============================================================================
-// FACE MESH VISUALIZATION
-// =============================================================================
+// Mouth smoothing function to filter out abrupt changes
+function smoothMouthOpening(rawMouthValue) {
+  // Add current value to history
+  mouthOpenHistory.push(rawMouthValue);
+  
+  // Keep only the last N frames
+  if (mouthOpenHistory.length > MOUTH_HISTORY_SIZE) {
+    mouthOpenHistory.shift();
+  }
+  
+  // Check for abrupt changes
+  const changeFromLast = Math.abs(rawMouthValue - lastSmoothedMouthValue);
+  
+  // If change is too abrupt, check if it's sustained across multiple frames
+  if (changeFromLast > MOUTH_CHANGE_THRESHOLD && mouthOpenHistory.length >= 3) {
+    // Check if the last 3 values are consistently in the new direction
+    const recent = mouthOpenHistory.slice(-3);
+    const isConsistent = recent.every(val => 
+      Math.abs(val - rawMouthValue) < MOUTH_CHANGE_THRESHOLD * 0.5
+    );
+    
+    if (!isConsistent) {
+      // Change is not sustained, use a dampened value
+      const dampingFactor = 0.1; // How much to blend towards new value
+      return lastSmoothedMouthValue + (rawMouthValue - lastSmoothedMouthValue) * dampingFactor;
+    }
+  }
+  
+  // Calculate moving average for sustained changes or small changes
+  const average = mouthOpenHistory.reduce((sum, val) => sum + val, 0) / mouthOpenHistory.length;
+  
+  // Apply gentle smoothing even for valid changes
+  const smoothingFactor = 0.7; // How much weight to give to current average
+  const smoothedValue = lastSmoothedMouthValue * (1 - smoothingFactor) + average * smoothingFactor;
+  
+  // Update last smoothed value
+  lastSmoothedMouthValue = smoothedValue;
+  
+  return smoothedValue;
+}
 
+// Draw face mesh visualization
 function drawFaceMesh(ctx, landmarks, width, height) {
-  // Set basic drawing styles
+  const FACE_CONNECTIONS = [
+    // Face oval
+    [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288],
+    [397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109],
+    
+    // Left eye
+    [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246],
+    
+    // Right eye  
+    [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398],
+    
+    // Lips outer
+    [61, 84, 17, 314, 405, 320, 307, 375, 321, 308, 324, 318],
+    [78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308],
+    
+    // Nose
+    [1, 2, 5, 4, 6, 168, 8, 9, 10, 151, 195, 197, 196, 3, 51, 48, 115, 131, 134, 102, 49, 220, 305, 291, 303, 267, 269, 270, 267, 271, 272],
+    
+    // Eyebrows
+    [46, 53, 52, 51, 48, 115, 131, 134, 102, 48, 64],
+    [276, 283, 282, 295, 285, 336, 296, 334, 293, 300, 276]
+  ];
+
   ctx.strokeStyle = '#00FF00';
   ctx.lineWidth = 1;
   ctx.fillStyle = '#FF0000';
 
-  // Draw all landmarks as small points
+  // Draw landmarks as points
   for (let i = 0; i < landmarks.length; i++) {
     const x = landmarks[i].x * width;
     const y = landmarks[i].y * height;
@@ -545,29 +471,12 @@ function drawFaceMesh(ctx, landmarks, width, height) {
     ctx.fill();
   }
 
-  // Draw face contour
-  drawFaceContour(ctx, landmarks, width, height);
-  
-  // Draw eye contours
-  drawEyeContours(ctx, landmarks, width, height);
-  
-  // Draw lip contour
-  drawLipContour(ctx, landmarks, width, height);
-  
-  // Draw eyebrow contours
-  drawEyebrowContours(ctx, landmarks, width, height);
-  
-  // Highlight key tracking points
-  highlightTrackingPoints(ctx, landmarks, width, height);
-}
-
-function drawFaceContour(ctx, landmarks, width, height) {
+  // Draw connections
   ctx.strokeStyle = '#00FFFF';
   ctx.lineWidth = 1;
   
-  const faceOval = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 
-                    397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 
-                    172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109, 10];
+  // Draw face contour
+  const faceOval = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109, 10];
   
   ctx.beginPath();
   for (let i = 0; i < faceOval.length - 1; i++) {
@@ -582,12 +491,8 @@ function drawFaceContour(ctx, landmarks, width, height) {
     }
   }
   ctx.stroke();
-}
 
-function drawEyeContours(ctx, landmarks, width, height) {
-  ctx.strokeStyle = '#00FFFF';
-  ctx.lineWidth = 1;
-  
+  // Draw eyes
   const leftEye = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246, 33];
   const rightEye = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398, 362];
   
@@ -606,12 +511,8 @@ function drawEyeContours(ctx, landmarks, width, height) {
     }
     ctx.stroke();
   });
-}
 
-function drawLipContour(ctx, landmarks, width, height) {
-  ctx.strokeStyle = '#00FFFF';
-  ctx.lineWidth = 1;
-  
+  // Draw lips
   const lips = [61, 84, 17, 314, 405, 320, 307, 375, 321, 308, 324, 318, 78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 375, 321, 308, 324, 318, 61];
   
   ctx.beginPath();
@@ -627,34 +528,46 @@ function drawLipContour(ctx, landmarks, width, height) {
     }
   }
   ctx.stroke();
-}
 
-function drawEyebrowContours(ctx, landmarks, width, height) {
-  ctx.strokeStyle = '#00FF88';
+  // Draw eyebrows with enhanced visualization
+  ctx.strokeStyle = '#00FF88'; // Green-cyan for eyebrows
   ctx.lineWidth = 2;
   
+  // Correct MediaPipe eyebrow landmark points (following the natural eyebrow curve)
   const leftEyebrow = [70, 63, 105, 66, 107, 55, 65, 52, 53, 46];
   const rightEyebrow = [300, 293, 334, 296, 336, 285, 295, 282, 283, 276];
   
-  [leftEyebrow, rightEyebrow].forEach(eyebrow => {
-    ctx.beginPath();
-    for (let i = 0; i < eyebrow.length - 1; i++) {
-      const point1 = landmarks[eyebrow[i]];
-      const point2 = landmarks[eyebrow[i + 1]];
-      
-      if (point1 && point2) {
-        if (i === 0) {
-          ctx.moveTo(point1.x * width, point1.y * height);
-        }
-        ctx.lineTo(point2.x * width, point2.y * height);
+  // Draw left eyebrow
+  ctx.beginPath();
+  for (let i = 0; i < leftEyebrow.length - 1; i++) {
+    const point1 = landmarks[leftEyebrow[i]];
+    const point2 = landmarks[leftEyebrow[i + 1]];
+    
+    if (point1 && point2) {
+      if (i === 0) {
+        ctx.moveTo(point1.x * width, point1.y * height);
       }
+      ctx.lineTo(point2.x * width, point2.y * height);
     }
-    ctx.stroke();
-  });
-}
+  }
+  ctx.stroke();
 
-function highlightTrackingPoints(ctx, landmarks, width, height) {
-  // Highlight head tracking points (yellow)
+  // Draw right eyebrow
+  ctx.beginPath();
+  for (let i = 0; i < rightEyebrow.length - 1; i++) {
+    const point1 = landmarks[rightEyebrow[i]];
+    const point2 = landmarks[rightEyebrow[i + 1]];
+    
+    if (point1 && point2) {
+      if (i === 0) {
+        ctx.moveTo(point1.x * width, point1.y * height);
+      }
+      ctx.lineTo(point2.x * width, point2.y * height);
+    }
+  }
+  ctx.stroke();
+
+  // Highlight key points used for head tracking
   ctx.fillStyle = '#FFFF00';
   const headTrackingPoints = [1, 234, 454]; // nose, left face, right face
   headTrackingPoints.forEach(pointIndex => {
@@ -666,8 +579,8 @@ function highlightTrackingPoints(ctx, landmarks, width, height) {
     }
   });
 
-  // Highlight mouth tracking points (magenta)
-  ctx.fillStyle = '#FF00FF';
+  // Highlight mouth tracking points for size control
+  ctx.fillStyle = '#FF00FF'; // Magenta for mouth points
   const mouthTrackingPoints = [13, 14, 61, 291]; // upper lip, lower lip, left corner, right corner
   mouthTrackingPoints.forEach(pointIndex => {
     const point = landmarks[pointIndex];
@@ -678,10 +591,10 @@ function highlightTrackingPoints(ctx, landmarks, width, height) {
     }
   });
 
-  // Highlight eyebrow tracking points (green-cyan)
-  ctx.fillStyle = '#00FF88';
+  // Highlight eyebrow tracking points
+  ctx.fillStyle = '#00FF88'; // Green-cyan for eyebrow points
   const eyebrowTrackingPoints = [70, 63, 105, 66, 107, 55, 65, 52, 53, 46, 
-                                 300, 293, 334, 296, 336, 285, 295, 282, 283, 276];
+                                 300, 293, 334, 296, 336, 285, 295, 282, 283, 276]; // key eyebrow landmarks
   eyebrowTrackingPoints.forEach(pointIndex => {
     const point = landmarks[pointIndex];
     if (point) {
@@ -692,10 +605,7 @@ function highlightTrackingPoints(ctx, landmarks, width, height) {
   });
 }
 
-// =============================================================================
-// ANIMATION AND RENDERING
-// =============================================================================
-
+// Animate cube
 function animate() {
   requestAnimationFrame(animate);
   updateBlinkCircles(); // Update blink circles each frame
@@ -703,10 +613,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-// =============================================================================
-// EVENT HANDLERS
-// =============================================================================
-
+// Handle window resize
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -715,17 +622,13 @@ function onWindowResize() {
 
 window.addEventListener('resize', onWindowResize);
 
-// =============================================================================
-// APPLICATION INITIALIZATION
-// =============================================================================
-
-// Start animation loop
+// Start animation immediately
 animate();
 
 // Initialize MediaPipe when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeMediaPipe);
 } else {
-  // DOM is already ready, small delay to ensure scripts are loaded
-  setTimeout(initializeMediaPipe, 100);
+  // DOM is already ready
+  setTimeout(initializeMediaPipe, 100); // Small delay to ensure scripts are loaded
 }
