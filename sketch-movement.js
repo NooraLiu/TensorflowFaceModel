@@ -46,6 +46,16 @@ controls.target.set(0, 1, 0);
 let eyebrowBaseline = null;
 let eyebrowReadings = [];
 
+// Robust eyebrow detection system
+let leftEyebrowRatioHistory = [];
+let rightEyebrowRatioHistory = [];
+let avgEyebrowRatioHistory = [];
+let eyebrowBaselines = { left: null, right: null, average: null };
+let lastEyebrowVelocity = 0;
+const EYEBROW_HISTORY_SIZE = 10;
+const EYEBROW_RATIO_THRESHOLD = 0.005; // Minimum distance decrease from baseline (eyebrow raised)
+const HEAD_POSE_TOLERANCE = 0.08; // Maximum deviation from calibration pose for eyebrow detection
+
 // Head position baseline calibration
 let headTurnBaseline = null;
 let headTiltBaseline = null;
@@ -82,10 +92,29 @@ const CAMERA_HEIGHT = 5;
 const CAMERA_DISTANCE = 8;
 let cameraRotationY = 0; // Camera Y-axis rotation from head turns
 let invertCameraControls = true; // Toggle for camera control direction (default: inverted)
+const CAMERA_ROTATION_SPEED = 0.02; // Speed of camera rotation accumulation
+let cameraRelativeMovement = true; // Toggle for camera-relative vs world-coordinate movement
 
 // =============================================================================
-// BLINK DETECTION SYSTEM
+// SMILE DETECTION SYSTEM
 // =============================================================================
+
+// Smile detection variables
+let smileHistory = [];
+let lastSmileTime = 0;
+let smileCurves = []; // Array to store smile-triggered curves
+const SMILE_HISTORY_SIZE = 5;
+const SMILE_THRESHOLD = 0.02; // Minimum mouth corner elevation for smile detection
+const SMILE_COOLDOWN = 1000; // Minimum time between smile detections (ms)
+
+// =============================================================================
+// EYEBROW "WOW" TEXT SYSTEM
+// =============================================================================
+
+// Wow text variables
+let wowTexts = []; // Array to store wow text objects
+let lastWowTime = 0;
+const WOW_COOLDOWN = 500; // Minimum time between wow displays (ms)
 
 // Blink detection variables
 let blinkCircles = []; // Array to store blink-triggered circles
@@ -95,7 +124,7 @@ const BLINK_THRESHOLD = 0.25;
 const BLINK_COOLDOWN = 150;
 
 // =============================================================================
-// MOUTH SMOOTHING SYSTEM
+// BLINK DETECTION SYSTEM
 // =============================================================================
 
 // Mouth smoothing variables
@@ -279,59 +308,69 @@ function onResults(results, meshCtx, meshCanvas) {
       const rawMouthOpen = Math.min(mouthHeight / (mouthWidth * 0.3), 3.0);
       const smoothedMouthOpen = smoothMouthOpening(rawMouthOpen);
       const cubeScale = Math.max(0.3, smoothedMouthOpen);
+      const cubeHeight = 0.5 + (smoothedMouthOpen - 1.0) * 2.0; // Base height 0.5, mouth controls additional height
+      
+        // Robust eyebrow ratio calculations with pitch compensation
+        const eyebrowLeftEyeHeight = Math.abs(leftEyeTop.y - leftEyeBottom.y);
+        const eyebrowRightEyeHeight = Math.abs(rightEyeTop.y - rightEyeBottom.y);
+        const avgEyeHeight = (eyebrowLeftEyeHeight + eyebrowRightEyeHeight) / 2;
+        
+        // Check if eyes are blinking (small eye height indicates blink)
+        const eyebrowLeftEyeWidth = Math.abs(leftEyeRight.x - leftEyeLeft.x);
+        const eyebrowRightEyeWidth = Math.abs(rightEyeRight.x - rightEyeLeft.x);
+        const eyebrowLeftEyeRatio = eyebrowLeftEyeHeight / eyebrowLeftEyeWidth;
+        const eyebrowRightEyeRatio = eyebrowRightEyeHeight / eyebrowRightEyeWidth;
+        const isBlinking = eyebrowLeftEyeRatio < BLINK_THRESHOLD || eyebrowRightEyeRatio < BLINK_THRESHOLD;
+        
+        // Simple eyebrow detection: distance from eyebrow to eye lower lid
+        const leftEyebrowToLowerLid = Math.abs(leftEyebrowBottom.y - leftEyeBottom.y);
+        const rightEyebrowToLowerLid = Math.abs(rightEyebrowBottom.y - rightEyeBottom.y);
+        const avgEyebrowToLowerLid = (leftEyebrowToLowerLid + rightEyebrowToLowerLid) / 2;
+        
+        // Store for eyebrow detection
+        var eyebrowDistance = avgEyebrowToLowerLid;
 
-      // Eyebrow calculations
-      const eyeDistance = Math.sqrt(
-        Math.pow(rightEye.x - leftEye.x, 2) + 
-        Math.pow(rightEye.y - leftEye.y, 2)
-      );
-      const leftEyebrowToHead = Math.abs(leftEyebrowBottom.y - headTop.y) / eyeDistance;
-      const rightEyebrowToHead = Math.abs(rightEyebrowBottom.y - headTop.y) / eyeDistance;
-      const avgEyebrowToHead = (leftEyebrowToHead + rightEyebrowToHead) / 2;
-      
-      // Calibration
-      if (!isCalibrated) {
-        eyebrowReadings.push(avgEyebrowToHead);
-        headTurnReadings.push(rawHeadTurnAngle);
-        headTiltReadings.push(rawHeadTiltAngle);
-        headRollReadings.push(rawHeadRollAngle);
-        
-        const statusDiv = document.getElementById('status');
-        if (statusDiv) {
-          const progress = Math.round((eyebrowReadings.length / CALIBRATION_SAMPLES) * 100);
-          statusDiv.textContent = `Calibrating face baseline... ${progress}%`;
-        }
-        
-        if (eyebrowReadings.length >= CALIBRATION_SAMPLES) {
-          eyebrowReadings.sort((a, b) => a - b);
-          headTurnReadings.sort((a, b) => a - b);
-          headTiltReadings.sort((a, b) => a - b);
-          headRollReadings.sort((a, b) => a - b);
+        // Calibration
+        if (!isCalibrated) {
+          eyebrowReadings.push(eyebrowDistance);
+          headTurnReadings.push(rawHeadTurnAngle);
+          headTiltReadings.push(rawHeadTiltAngle);
+          headRollReadings.push(rawHeadRollAngle);
           
-          eyebrowBaseline = eyebrowReadings[Math.floor(eyebrowReadings.length / 2)];
-          headTurnBaseline = headTurnReadings[Math.floor(headTurnReadings.length / 2)];
-          headTiltBaseline = headTiltReadings[Math.floor(headTiltReadings.length / 2)];
-          headRollBaseline = headRollReadings[Math.floor(headRollReadings.length / 2)];
-          
-          isCalibrated = true;
-          console.log('Baselines calibrated');
-          
+          const statusDiv = document.getElementById('status');
           if (statusDiv) {
-            statusDiv.textContent = 'Face baseline calibrated! All systems active.';
-            statusDiv.style.color = '#00FF00';
+            const progress = Math.round((eyebrowReadings.length / CALIBRATION_SAMPLES) * 100);
+            statusDiv.textContent = `Calibrating face baseline... ${progress}%`;
           }
-        }
-        
-        cube.rotation.y = 0;
-        cube.rotation.x = 0;
-        cube.rotation.z = 0;
-        cube.material.forEach(mat => {
-          mat.wireframe = false;
-        });
-        return;
-      }
-      
-      // Apply controls after calibration
+          
+          if (eyebrowReadings.length >= CALIBRATION_SAMPLES) {
+            eyebrowReadings.sort((a, b) => a - b);
+            headTurnReadings.sort((a, b) => a - b);
+            headTiltReadings.sort((a, b) => a - b);
+            headRollReadings.sort((a, b) => a - b);
+            
+            // Store simple eyebrow baseline
+            eyebrowBaselines.average = eyebrowReadings[Math.floor(eyebrowReadings.length / 2)];
+            eyebrowBaseline = eyebrowBaselines.average; // Keep for compatibility
+            headTurnBaseline = headTurnReadings[Math.floor(headTurnReadings.length / 2)];
+            headTiltBaseline = headTiltReadings[Math.floor(headTiltReadings.length / 2)];
+            headRollBaseline = headRollReadings[Math.floor(headRollReadings.length / 2)];
+            
+            isCalibrated = true;
+            console.log('Baselines calibrated with simple eyebrow-to-lower-lid distance');
+            console.log('Eyebrow baseline distance:', eyebrowBaselines.average);
+            
+            if (statusDiv) {
+              statusDiv.textContent = 'Face baseline calibrated! All systems active.';
+              statusDiv.style.color = '#00FF00';
+            }
+          }
+          
+          cube.rotation.y = 0;
+          cube.rotation.x = 0;
+          cube.rotation.z = 0;
+          return;
+        }      // Apply controls after calibration
       const headTurnAngle = (rawHeadTurnAngle - headTurnBaseline) * Math.PI * 4;
       const rawHeadTiltMovement = (rawHeadTiltAngle - headTiltBaseline) * 20; // Forward/backward movement
       const rawHeadRollMovement = (rawHeadRollAngle - headRollBaseline) * 20; // Left/right movement
@@ -342,8 +381,23 @@ function onResults(results, meshCtx, meshCanvas) {
       const filteredHeadRollMovement = applyRollThreshold(rawHeadRollMovement);
 
       // Update cube movement based on filtered head movements
-      cubeVelocity.z += filteredHeadTiltMovement * BASE_MOVEMENT_SPEED * movementSensitivity; // Forward/backward
-      cubeVelocity.x -= filteredHeadRollMovement * BASE_MOVEMENT_SPEED * rollSensitivity; // Left/right (reversed)
+      const forwardMovement = filteredHeadTiltMovement * BASE_MOVEMENT_SPEED * movementSensitivity;
+      const rightMovement = -filteredHeadRollMovement * BASE_MOVEMENT_SPEED * rollSensitivity;
+      
+      if (cameraRelativeMovement) {
+        // Camera-relative movement: adjust for camera rotation
+        const cosRotation = Math.cos(cameraRotationY);
+        const sinRotation = Math.sin(cameraRotationY);
+        
+        // Forward/backward relative to camera direction
+        cubeVelocity.z += forwardMovement * cosRotation - rightMovement * sinRotation;
+        // Left/right relative to camera direction  
+        cubeVelocity.x += forwardMovement * sinRotation + rightMovement * cosRotation;
+      } else {
+        // World-coordinate movement: original behavior
+        cubeVelocity.z += forwardMovement; // Forward/backward in world coordinates
+        cubeVelocity.x += rightMovement; // Left/right in world coordinates
+      }
       
       // Apply damping to velocity
       cubeVelocity.x *= MOVEMENT_DAMPING;
@@ -356,10 +410,23 @@ function onResults(results, meshCtx, meshCanvas) {
       // Apply position to cube
       cube.position.x = cubePosition.x;
       cube.position.z = cubePosition.z;
+      cube.position.y = Math.max(0.5, cubeHeight); // Set height based on mouth, minimum 0.5 to stay above ground
       
       // Apply other controls
-      const cameraRotation = (invertCameraControls ? -filteredHeadTurnAngle : filteredHeadTurnAngle) * cameraSensitivity;
-      cameraRotationY = cameraRotation; // Apply filtered head turn to camera rotation
+      const filteredCameraInput = applyTurnThreshold(headTurnAngle);
+      
+      if (cameraRelativeMovement) {
+        // Accumulate camera rotation instead of direct mapping
+        if (Math.abs(filteredCameraInput) > 0) {
+          const rotationDirection = invertCameraControls ? -1 : 1;
+          cameraRotationY += filteredCameraInput * CAMERA_ROTATION_SPEED * cameraSensitivity * rotationDirection;
+        }
+      } else {
+        // Direct mapping mode (original behavior)
+        const cameraRotation = (invertCameraControls ? -filteredCameraInput : filteredCameraInput) * cameraSensitivity;
+        cameraRotationY = cameraRotation;
+      }
+      
       cube.rotation.y = 0; // No cube Y-axis rotation
       cube.rotation.z = 0; // No Z-axis rotation since we use head roll for movement
       cube.scale.setScalar(cubeScale);
@@ -367,20 +434,31 @@ function onResults(results, meshCtx, meshCanvas) {
       // Update camera to follow cube
       updateCameraFollow();
       
-      // Eyebrow wireframe control
-      const eyebrowMovement = eyebrowBaseline - avgEyebrowToHead;
-      const eyebrowAsymmetry = Math.abs(leftEyebrowToHead - rightEyebrowToHead);
-      const isSymmetrical = eyebrowAsymmetry < 0.3;
-      const eyebrowIntensity = Math.max(0, Math.min(eyebrowMovement * 50, 1.0));
+      // Simple eyebrow "Wow" detection: only when head is close to calibration pose
+      const headTurnDiff = Math.abs(rawHeadTurnAngle - headTurnBaseline);
+      const headTiltDiff = Math.abs(rawHeadTiltAngle - headTiltBaseline);
+      const headRollDiff = Math.abs(rawHeadRollAngle - headRollBaseline);
+      const isHeadNearCalibrationPose = headTurnDiff < HEAD_POSE_TOLERANCE && 
+                                       headTiltDiff < HEAD_POSE_TOLERANCE && 
+                                       headRollDiff < HEAD_POSE_TOLERANCE;
       
-      if (eyebrowIntensity > 0.91 && isSymmetrical) {
-        cube.material.forEach(mat => {
-          mat.wireframe = true;
-        });
-      } else {
-        cube.material.forEach(mat => {
-          mat.wireframe = false;
-        });
+      // Debug logging
+      console.log(`Eyebrow distance: ${eyebrowDistance.toFixed(4)}, Baseline: ${eyebrowBaselines.average ? eyebrowBaselines.average.toFixed(4) : 'null'}`);
+      console.log(`Head pose - Turn: ${headTurnDiff.toFixed(3)}, Tilt: ${headTiltDiff.toFixed(3)}, Roll: ${headRollDiff.toFixed(3)}, In tolerance: ${isHeadNearCalibrationPose}`);
+      
+      if (isHeadNearCalibrationPose && eyebrowBaselines.average !== null) {
+        // When eyebrows are raised, distance to lower lid gets larger (not smaller!)
+        const distanceIncrease = eyebrowDistance - eyebrowBaselines.average;
+        const currentWowTime = Date.now();
+        
+        console.log(`Distance increase: ${distanceIncrease.toFixed(4)}, Threshold: ${EYEBROW_RATIO_THRESHOLD}`);
+        
+        // Simple threshold: if distance increased significantly (eyebrows raised)
+        if (distanceIncrease > EYEBROW_RATIO_THRESHOLD && (currentWowTime - lastWowTime) > WOW_COOLDOWN) {
+          createWowText();
+          lastWowTime = currentWowTime;
+          console.log(`Wow! Eyebrows raised! Distance increase: ${distanceIncrease.toFixed(4)}`);
+        }
       }
     }
   } catch (error) {
@@ -494,8 +572,94 @@ function smoothMouthOpening(rawMouthValue) {
 }
 
 // =============================================================================
-// BLINK CIRCLE EFFECTS
+// ROBUST EYEBROW DETECTION SYSTEM
 // =============================================================================
+
+function updateEyebrowHistory(leftRatio, rightRatio, avgRatio) {
+  // Add current ratios to history
+  leftEyebrowRatioHistory.push(leftRatio);
+  rightEyebrowRatioHistory.push(rightRatio);
+  avgEyebrowRatioHistory.push(avgRatio);
+  
+  // Maintain history size
+  if (leftEyebrowRatioHistory.length > EYEBROW_HISTORY_SIZE) {
+    leftEyebrowRatioHistory.shift();
+    rightEyebrowRatioHistory.shift();
+    avgEyebrowRatioHistory.shift();
+  }
+}
+
+function calculateEyebrowVelocity() {
+  if (avgEyebrowRatioHistory.length < 3) {
+    return 0;
+  }
+  
+  // Calculate velocity as rate of change over last few frames
+  const recent = avgEyebrowRatioHistory.slice(-3);
+  const velocity = recent[recent.length - 1] - recent[0];
+  
+  return Math.max(0, velocity); // Only positive velocity (eyebrow raising)
+}
+
+// =============================================================================
+// WOW TEXT EFFECTS
+// =============================================================================
+
+function createWowText() {
+  // Create HTML overlay text instead of 3D text for better visibility
+  const wowElement = document.createElement('div');
+  wowElement.textContent = 'WOW!';
+  wowElement.style.cssText = `
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: Arial, sans-serif;
+    font-size: 48px;
+    font-weight: bold;
+    color: #${Math.floor(Math.random() * 16777215).toString(16)};
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    z-index: 1000;
+    pointer-events: none;
+    animation: wowAnimation 2s ease-out forwards;
+  `;
+  
+  // Add CSS animation keyframes if not already added
+  if (!document.getElementById('wow-animation-style')) {
+    const style = document.createElement('style');
+    style.id = 'wow-animation-style';
+    style.textContent = `
+      @keyframes wowAnimation {
+        0% {
+          opacity: 1;
+          transform: translateX(-50%) scale(1);
+        }
+        50% {
+          transform: translateX(-50%) scale(1.2);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-50%) scale(0.8) translateY(-20px);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  document.body.appendChild(wowElement);
+  
+  // Remove the element after animation completes
+  setTimeout(() => {
+    if (wowElement.parentNode) {
+      wowElement.parentNode.removeChild(wowElement);
+    }
+  }, 2000);
+}
+
+function updateWowTexts() {
+  // No longer needed since we're using HTML overlay
+  // Keeping function for compatibility
+}
 
 function createBlinkCircle() {
   const circle = {
@@ -722,6 +886,7 @@ function initializeSensitivityControls() {
   const cameraSensitivitySlider = document.getElementById('camera-sensitivity-slider');
   const cameraSensitivityValue = document.getElementById('camera-sensitivity-value');
   const invertCameraToggle = document.getElementById('invert-camera-toggle');
+  const cameraRelativeToggle = document.getElementById('camera-relative-toggle');
   
   if (sensitivitySlider && sensitivityValue) {
     // Update forward/back sensitivity when slider changes
@@ -768,6 +933,22 @@ function initializeSensitivityControls() {
     
     // Initialize state
     invertCameraToggle.checked = invertCameraControls;
+  }
+  
+  if (cameraRelativeToggle) {
+    // Update camera-relative movement setting when toggle changes
+    cameraRelativeToggle.addEventListener('change', (event) => {
+      cameraRelativeMovement = event.target.checked;
+      console.log(`Camera-relative movement: ${cameraRelativeMovement}`);
+      
+      // Reset camera rotation when switching modes to avoid confusion
+      if (!cameraRelativeMovement) {
+        cameraRotationY = 0;
+      }
+    });
+    
+    // Initialize state
+    cameraRelativeToggle.checked = cameraRelativeMovement;
   }
 }
 
