@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FaceMesh + Three.js</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+    canvas { display: block; }
+    #video { 
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 320px;
+      height: 240px;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      z-index: 1000;
+    }
+    #mesh-canvas {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 320px;
+      height: 240px;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      z-index: 1001;
+      pointer-events: none;
+    }
+    #error { 
+      position: absolute; 
+      top: 10px; 
+      left: 10px; 
+      color: red; 
+      background: rgba(0,0,0,0.8); 
+      padding: 10px; 
+      border-radius: 5px;
+      display: none;
+      z-index: 1001;
+    }
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      color: white;
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1000;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="error"></div>
+  <video id="video" autoplay playsinline></video>
+  <canvas id="mesh-canvas" width="320" height="240"></canvas>
+  <div id="controls">
+    <div><strong>Face Controls:</strong></div>
+    <div>🔄 Head Left/Right: Rotate cube</div>
+    <div>🔄 Head Forward/Back: Tilt cube</div>
+    <div>� Head Side Tilt: Roll cube</div>
+    <div>�📏 Open Mouth: Scale cube size</div>
+    <div>🤨 Raise Eyebrows: Change color/wireframe</div>
+    <div>👁️ Blink: Spawn random colored circles</div>
+    <div id="calibration-status" style="margin-top: 8px; color: #FFD700;">
+      🔧 Calibrating face baseline...
+    </div>
+    <div style="margin-top: 8px; font-size: 10px;">
+      <span style="color: #FFFF00;">●</span> Head tracking<br>
+      <span style="color: #FF00FF;">●</span> Mouth tracking<br>
+      <span style="color: #00FF88;">●</span> Eyebrow tracking
+    </div>
+  </div>
+
+  <!-- Load MediaPipe FaceMesh -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+  <!-- Your sketch -->
+  <script type="module" src="./sketch.js"></script>
+</body>
+</html>
