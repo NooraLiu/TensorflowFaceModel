@@ -53,8 +53,8 @@ let avgEyebrowRatioHistory = [];
 let eyebrowBaselines = { left: null, right: null, average: null };
 let lastEyebrowVelocity = 0;
 const EYEBROW_HISTORY_SIZE = 10;
-const EYEBROW_RATIO_THRESHOLD = 0.005; // Minimum distance decrease from baseline (eyebrow raised)
-const HEAD_POSE_TOLERANCE = 0.08; // Maximum deviation from calibration pose for eyebrow detection
+const EYEBROW_RATIO_THRESHOLD = 0.01; // Minimum distance increase from baseline (eyebrow raised)
+const HEAD_POSE_TOLERANCE = 0.05; // Maximum deviation from calibration pose for eyebrow detection
 
 // Head position baseline calibration
 let headTurnBaseline = null;
@@ -102,10 +102,16 @@ let cameraRelativeMovement = true; // Toggle for camera-relative vs world-coordi
 // Smile detection variables
 let smileHistory = [];
 let lastSmileTime = 0;
-let smileCurves = []; // Array to store smile-triggered curves
+let smileCurveCanvas = null; // 2D canvas for smile curve
+let smileCurveCtx = null;
 const SMILE_HISTORY_SIZE = 5;
-const SMILE_THRESHOLD = 0.02; // Minimum mouth corner elevation for smile detection
+const SMILE_THRESHOLD = 0.015; // Minimum mouth corner elevation for smile detection
 const SMILE_COOLDOWN = 1000; // Minimum time between smile detections (ms)
+
+// Frown detection variables
+let lastFrownTime = 0;
+const FROWN_THRESHOLD = -0.01; // Minimum mouth corner depression for frown detection (negative value)
+const FROWN_COOLDOWN = 1000; // Minimum time between frown detections (ms)
 
 // =============================================================================
 // EYEBROW "WOW" TEXT SYSTEM
@@ -309,6 +315,13 @@ function onResults(results, meshCtx, meshCanvas) {
       const smoothedMouthOpen = smoothMouthOpening(rawMouthOpen);
       const cubeScale = Math.max(0.3, smoothedMouthOpen);
       const cubeHeight = 0.5 + (smoothedMouthOpen - 1.0) * 2.0; // Base height 0.5, mouth controls additional height
+
+      // Smile detection: mouth corners vs mouth center
+      const mouthCenterY = (upperLip.y + lowerLip.y) / 2;
+      const leftCornerElevation = mouthCenterY - lipCornerLeft.y; // Positive when corner is above center
+      const rightCornerElevation = mouthCenterY - lipCornerRight.y; // Positive when corner is above center
+      const avgCornerElevation = (leftCornerElevation + rightCornerElevation) / 2;
+      const isSymmetricalSmile = Math.abs(leftCornerElevation - rightCornerElevation) < 0.01;
       
         // Robust eyebrow ratio calculations with pitch compensation
         const eyebrowLeftEyeHeight = Math.abs(leftEyeTop.y - leftEyeBottom.y);
@@ -442,22 +455,48 @@ function onResults(results, meshCtx, meshCanvas) {
                                        headTiltDiff < HEAD_POSE_TOLERANCE && 
                                        headRollDiff < HEAD_POSE_TOLERANCE;
       
-      // Debug logging
-      console.log(`Eyebrow distance: ${eyebrowDistance.toFixed(4)}, Baseline: ${eyebrowBaselines.average ? eyebrowBaselines.average.toFixed(4) : 'null'}`);
-      console.log(`Head pose - Turn: ${headTurnDiff.toFixed(3)}, Tilt: ${headTiltDiff.toFixed(3)}, Roll: ${headRollDiff.toFixed(3)}, In tolerance: ${isHeadNearCalibrationPose}`);
-      
       if (isHeadNearCalibrationPose && eyebrowBaselines.average !== null) {
-        // When eyebrows are raised, distance to lower lid gets larger (not smaller!)
+        // When eyebrows are raised, distance to lower lid gets larger
         const distanceIncrease = eyebrowDistance - eyebrowBaselines.average;
         const currentWowTime = Date.now();
         
-        console.log(`Distance increase: ${distanceIncrease.toFixed(4)}, Threshold: ${EYEBROW_RATIO_THRESHOLD}`);
+        // Only log when close to triggering or when triggered
+        if (distanceIncrease > EYEBROW_RATIO_THRESHOLD * 0.7) {
+          console.log(`Eyebrow distance increase: ${distanceIncrease.toFixed(4)}, Threshold: ${EYEBROW_RATIO_THRESHOLD}, In pose: ${isHeadNearCalibrationPose}`);
+        }
         
         // Simple threshold: if distance increased significantly (eyebrows raised)
         if (distanceIncrease > EYEBROW_RATIO_THRESHOLD && (currentWowTime - lastWowTime) > WOW_COOLDOWN) {
           createWowText();
           lastWowTime = currentWowTime;
-          console.log(`Wow! Eyebrows raised! Distance increase: ${distanceIncrease.toFixed(4)}`);
+          console.log(`WOW! Eyebrows raised! Distance increase: ${distanceIncrease.toFixed(4)}`);
+        }
+      } else if (eyebrowBaselines.average !== null) {
+        // Occasional debug info when not in calibration pose
+        if (Math.random() < 0.01) { // Only 1% of frames
+          console.log(`Head not in calibration pose - Turn: ${headTurnDiff.toFixed(3)}, Tilt: ${headTiltDiff.toFixed(3)}, Roll: ${headRollDiff.toFixed(3)}`);
+        }
+      }
+      
+      // Smile and frown detection with curve updates (only when head is close to calibration pose)
+      updateSmileHistory(avgCornerElevation);
+      update2DSmileCurve(avgCornerElevation);
+      
+      if (isHeadNearCalibrationPose) {
+        const currentExpressionTime = Date.now();
+        
+        // Smile detection
+        if (avgCornerElevation > SMILE_THRESHOLD && isSymmetricalSmile && (currentExpressionTime - lastSmileTime) > SMILE_COOLDOWN) {
+          create2DSmileyFace(); // Show 2D smiley face overlay
+          lastSmileTime = currentExpressionTime;
+          console.log(`Smile detected! Corner elevation: ${avgCornerElevation.toFixed(4)}`);
+        }
+        
+        // Frown detection
+        if (avgCornerElevation < FROWN_THRESHOLD && isSymmetricalSmile && (currentExpressionTime - lastFrownTime) > FROWN_COOLDOWN) {
+          create2DFrownFace(); // Show 2D frown face overlay
+          lastFrownTime = currentExpressionTime;
+          console.log(`Frown detected! Corner depression: ${avgCornerElevation.toFixed(4)}`);
         }
       }
     }
@@ -599,6 +638,188 @@ function calculateEyebrowVelocity() {
   const velocity = recent[recent.length - 1] - recent[0];
   
   return Math.max(0, velocity); // Only positive velocity (eyebrow raising)
+}
+
+// =============================================================================
+// 2D SMILE CURVE EFFECTS
+// =============================================================================
+
+function updateSmileHistory(cornerElevation) {
+  smileHistory.push(cornerElevation);
+  
+  if (smileHistory.length > SMILE_HISTORY_SIZE) {
+    smileHistory.shift();
+  }
+}
+
+function create2DSmileCurveCanvas() {
+  // Create 2D canvas overlay for smile curve
+  smileCurveCanvas = document.createElement('canvas');
+  smileCurveCanvas.width = 220; // Match width of sensitivity control panel
+  smileCurveCanvas.height = 80;
+  smileCurveCanvas.style.cssText = `
+    position: fixed;
+    top: 480px;
+    left: 10px;
+    z-index: 500;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.8);
+  `;
+  
+  smileCurveCtx = smileCurveCanvas.getContext('2d');
+  document.body.appendChild(smileCurveCanvas);
+}
+
+function update2DSmileCurve(smileIntensity) {
+  if (!smileCurveCanvas) {
+    create2DSmileCurveCanvas();
+  }
+  
+  // Clear canvas
+  smileCurveCtx.clearRect(0, 0, smileCurveCanvas.width, smileCurveCanvas.height);
+  
+  // Draw the curve
+  const centerX = smileCurveCanvas.width / 2;
+  const centerY = smileCurveCanvas.height / 2;
+  const curveWidth = 80; // Adjusted for narrower canvas
+  const curveHeight = Math.abs(smileIntensity) * 400; // Scale factor for curve height
+  
+  smileCurveCtx.beginPath();
+  smileCurveCtx.lineWidth = 3;
+  
+  // Set color based on expression type
+  if (smileIntensity > SMILE_THRESHOLD) {
+    smileCurveCtx.strokeStyle = '#FF6B6B'; // Red when smiling
+  } else if (smileIntensity < FROWN_THRESHOLD) {
+    smileCurveCtx.strokeStyle = '#6B6BFF'; // Blue when frowning
+  } else {
+    smileCurveCtx.strokeStyle = '#00FF88'; // Green when neutral
+  }
+  
+  // Draw curve points
+  for (let i = 0; i <= 40; i++) {
+    const t = (i / 40) * 2 - 1; // Range from -1 to 1
+    const x = centerX + t * curveWidth;
+    
+    let y;
+    if (smileIntensity > 0) {
+      // Positive = smile: curve upward (inverted from 3D since canvas Y is flipped)
+      y = centerY - curveHeight * (1 - t * t);
+    } else {
+      // Negative = frown: curve downward
+      y = centerY + curveHeight * (1 - t * t);
+    }
+    
+    if (i === 0) {
+      smileCurveCtx.moveTo(x, y);
+    } else {
+      smileCurveCtx.lineTo(x, y);
+    }
+  }
+  
+  smileCurveCtx.stroke();
+  
+  // Add text label
+  smileCurveCtx.fillStyle = '#FFFFFF';
+  smileCurveCtx.font = '12px Arial';
+  smileCurveCtx.textAlign = 'center';
+  smileCurveCtx.fillText('Mouth Expression', centerX, 15);
+}
+
+function create2DSmileyFace() {
+  // Create HTML overlay smiley face
+  const smileyElement = document.createElement('div');
+  smileyElement.textContent = '😊';
+  smileyElement.style.cssText = `
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 64px;
+    z-index: 1000;
+    pointer-events: none;
+    animation: smileyAnimation 3s ease-out forwards;
+  `;
+  
+  // Add CSS animation keyframes if not already added
+  if (!document.getElementById('smiley-animation-style')) {
+    const style = document.createElement('style');
+    style.id = 'smiley-animation-style';
+    style.textContent = `
+      @keyframes smileyAnimation {
+        0% {
+          opacity: 1;
+          transform: translateX(-50%) scale(1);
+        }
+        50% {
+          transform: translateX(-50%) scale(1.3);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-50%) scale(0.8) translateY(-30px);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  document.body.appendChild(smileyElement);
+  
+  // Remove the element after animation completes
+  setTimeout(() => {
+    if (smileyElement.parentNode) {
+      smileyElement.parentNode.removeChild(smileyElement);
+    }
+  }, 3000);
+}
+
+function create2DFrownFace() {
+  // Create HTML overlay frown face
+  const frownElement = document.createElement('div');
+  frownElement.textContent = '☹️';
+  frownElement.style.cssText = `
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 64px;
+    z-index: 1000;
+    pointer-events: none;
+    animation: frownAnimation 3s ease-out forwards;
+  `;
+  
+  // Add CSS animation keyframes if not already added
+  if (!document.getElementById('frown-animation-style')) {
+    const style = document.createElement('style');
+    style.id = 'frown-animation-style';
+    style.textContent = `
+      @keyframes frownAnimation {
+        0% {
+          opacity: 1;
+          transform: translateX(-50%) scale(1);
+        }
+        50% {
+          transform: translateX(-50%) scale(1.3);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-50%) scale(0.8) translateY(-30px);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  document.body.appendChild(frownElement);
+  
+  // Remove the element after animation completes
+  setTimeout(() => {
+    if (frownElement.parentNode) {
+      frownElement.parentNode.removeChild(frownElement);
+    }
+  }, 3000);
 }
 
 // =============================================================================
