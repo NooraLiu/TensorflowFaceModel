@@ -121,8 +121,24 @@
             <span id="roll-sensitivity-value">0.10x</span>
         </div>
         
+        <div style="margin-top: 15px; margin-bottom: 8px; font-weight: bold; color: #00FF88;">Camera Turn Sensitivity</div>
+        <input type="range" id="camera-sensitivity-slider" min="0.2" max="2.0" step="0.1" value="1.0" style="width: 100%; margin-bottom: 5px;">
+        <div style="text-align: center; font-size: 14px; color: #00FFFF;">
+            <span id="camera-sensitivity-value">1.0x</span>
+        </div>
+        
         <div style="margin-top: 8px; font-size: 11px; color: #ccc;">
             Adjust how responsive the cube movement is to your head tilting
+        </div>
+        
+        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #444;">
+            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #00FF88;">
+                <input type="checkbox" id="invert-camera-toggle" checked style="margin-right: 8px; transform: scale(1.2);">
+                Invert Camera Controls
+            </label>
+            <div style="margin-top: 5px; font-size: 10px; color: #999;">
+                Turn head left → camera goes right
+            </div>
         </div>
     </div>
     

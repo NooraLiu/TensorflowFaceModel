@@ -66,18 +66,22 @@ let cubePosition = { x: 0, z: 0 };
 const BASE_MOVEMENT_SPEED = 0.1; // Base speed multiplier
 let movementSensitivity = 0.3; // User-adjustable sensitivity for forward/backward (default 0.3x)
 let rollSensitivity = 0.10; // User-adjustable sensitivity for left/right (default 0.10x)
+let cameraSensitivity = 1.0; // User-adjustable sensitivity for camera rotation (default 1.0x)
 const MOVEMENT_DAMPING = 0.85;
 let cubeVelocity = { x: 0, z: 0 };
 
 // Movement threshold system
 const MOVEMENT_THRESHOLD = 0.03; // Minimum head tilt to trigger movement
 const ROLL_THRESHOLD = 0.04; // Minimum head roll to trigger left/right movement
+const TURN_THRESHOLD = 0.02; // Minimum head turn to trigger camera rotation
 const THRESHOLD_SMOOTHING = 0.7; // Smoothing factor for threshold filtering
 
 // Camera following variables
 const CAMERA_FOLLOW_SPEED = 0.05;
 const CAMERA_HEIGHT = 5;
 const CAMERA_DISTANCE = 8;
+let cameraRotationY = 0; // Camera Y-axis rotation from head turns
+let invertCameraControls = true; // Toggle for camera control direction (default: inverted)
 
 // =============================================================================
 // BLINK DETECTION SYSTEM
@@ -332,7 +336,8 @@ function onResults(results, meshCtx, meshCanvas) {
       const rawHeadTiltMovement = (rawHeadTiltAngle - headTiltBaseline) * 20; // Forward/backward movement
       const rawHeadRollMovement = (rawHeadRollAngle - headRollBaseline) * 20; // Left/right movement
 
-      // Apply movement threshold filter to both movements
+      // Apply threshold filters to all head movements
+      const filteredHeadTurnAngle = applyTurnThreshold(headTurnAngle);
       const filteredHeadTiltMovement = applyMovementThreshold(rawHeadTiltMovement);
       const filteredHeadRollMovement = applyRollThreshold(rawHeadRollMovement);
 
@@ -353,7 +358,9 @@ function onResults(results, meshCtx, meshCanvas) {
       cube.position.z = cubePosition.z;
       
       // Apply other controls
-      cube.rotation.y = headTurnAngle; // Keep Y-axis rotation from head turns
+      const cameraRotation = (invertCameraControls ? -filteredHeadTurnAngle : filteredHeadTurnAngle) * cameraSensitivity;
+      cameraRotationY = cameraRotation; // Apply filtered head turn to camera rotation
+      cube.rotation.y = 0; // No cube Y-axis rotation
       cube.rotation.z = 0; // No Z-axis rotation since we use head roll for movement
       cube.scale.setScalar(cubeScale);
       
@@ -413,15 +420,30 @@ function applyRollThreshold(rawMovement) {
   return scaledMovement * THRESHOLD_SMOOTHING;
 }
 
+function applyTurnThreshold(rawTurn) {
+  // Get absolute turn value
+  const absTurn = Math.abs(rawTurn);
+  
+  // If turn is below threshold, return 0 (no camera rotation)
+  if (absTurn < TURN_THRESHOLD) {
+    return 0;
+  }
+  
+  // Apply smooth scaling above threshold to avoid sudden jumps
+  const scaledTurn = rawTurn - (Math.sign(rawTurn) * TURN_THRESHOLD);
+  return scaledTurn * THRESHOLD_SMOOTHING;
+}
+
 // =============================================================================
 // CAMERA FOLLOWING SYSTEM
 // =============================================================================
 
 function updateCameraFollow() {
-  // Calculate target camera position behind the cube
-  const targetCameraX = cubePosition.x;
+  // Calculate camera position with rotation around the cube
+  const rotatedDistance = CAMERA_DISTANCE;
+  const targetCameraX = cubePosition.x + Math.sin(cameraRotationY) * rotatedDistance;
   const targetCameraY = CAMERA_HEIGHT;
-  const targetCameraZ = cubePosition.z + CAMERA_DISTANCE;
+  const targetCameraZ = cubePosition.z + Math.cos(cameraRotationY) * rotatedDistance;
   
   // Smoothly move camera toward target position
   camera.position.x += (targetCameraX - camera.position.x) * CAMERA_FOLLOW_SPEED;
@@ -697,6 +719,9 @@ function initializeSensitivityControls() {
   const sensitivityValue = document.getElementById('sensitivity-value');
   const rollSensitivitySlider = document.getElementById('roll-sensitivity-slider');
   const rollSensitivityValue = document.getElementById('roll-sensitivity-value');
+  const cameraSensitivitySlider = document.getElementById('camera-sensitivity-slider');
+  const cameraSensitivityValue = document.getElementById('camera-sensitivity-value');
+  const invertCameraToggle = document.getElementById('invert-camera-toggle');
   
   if (sensitivitySlider && sensitivityValue) {
     // Update forward/back sensitivity when slider changes
@@ -720,6 +745,29 @@ function initializeSensitivityControls() {
     
     // Initialize display
     rollSensitivityValue.textContent = `${rollSensitivity.toFixed(2)}x`;
+  }
+  
+  if (cameraSensitivitySlider && cameraSensitivityValue) {
+    // Update camera sensitivity when slider changes
+    cameraSensitivitySlider.addEventListener('input', (event) => {
+      cameraSensitivity = parseFloat(event.target.value);
+      cameraSensitivityValue.textContent = `${cameraSensitivity.toFixed(1)}x`;
+      console.log(`Camera sensitivity updated to: ${cameraSensitivity}x`);
+    });
+    
+    // Initialize display
+    cameraSensitivityValue.textContent = `${cameraSensitivity.toFixed(1)}x`;
+  }
+  
+  if (invertCameraToggle) {
+    // Update camera invert setting when toggle changes
+    invertCameraToggle.addEventListener('change', (event) => {
+      invertCameraControls = event.target.checked;
+      console.log(`Camera controls inverted: ${invertCameraControls}`);
+    });
+    
+    // Initialize state
+    invertCameraToggle.checked = invertCameraControls;
   }
 }
 
