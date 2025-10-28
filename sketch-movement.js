@@ -76,7 +76,7 @@ let cubePosition = { x: 0, z: 0 };
 const BASE_MOVEMENT_SPEED = 0.1; // Base speed multiplier
 let movementSensitivity = 0.3; // User-adjustable sensitivity for forward/backward (default 0.3x)
 let rollSensitivity = 0.10; // User-adjustable sensitivity for left/right (default 0.10x)
-let cameraSensitivity = 1.0; // User-adjustable sensitivity for camera rotation (default 1.0x)
+let cameraSensitivity = 2.0; // User-adjustable sensitivity for camera rotation (default 2.0x for camera-relative, 1.5x for world)
 const MOVEMENT_DAMPING = 0.85;
 let cubeVelocity = { x: 0, z: 0 };
 
@@ -126,8 +126,8 @@ const WOW_COOLDOWN = 500; // Minimum time between wow displays (ms)
 let blinkCircles = []; // Array to store blink-triggered circles
 let lastBlinkState = { left: false, right: false };
 let lastBlinkTime = 0;
-const BLINK_THRESHOLD = 0.25;
-const BLINK_COOLDOWN = 150;
+const BLINK_THRESHOLD = 0.3; // Relaxed threshold for better detection
+const BLINK_COOLDOWN = 100; // Reduced cooldown for more responsive detection
 
 // =============================================================================
 // BLINK DETECTION SYSTEM
@@ -272,7 +272,7 @@ function onResults(results, meshCtx, meshCanvas) {
         leftEyebrowBottom && rightEyebrowBottom && headTop &&
         leftEye && rightEye && leftEyeTop && leftEyeBottom && rightEyeTop && rightEyeBottom) {
       
-      // Blink detection
+      // Improved blink detection
       const leftEyeHeight = Math.abs(leftEyeTop.y - leftEyeBottom.y);
       const rightEyeHeight = Math.abs(rightEyeTop.y - rightEyeBottom.y);
       const leftEyeWidth = Math.abs(leftEyeRight.x - leftEyeLeft.x);
@@ -282,16 +282,23 @@ function onResults(results, meshCtx, meshCanvas) {
       
       const leftBlink = leftEyeRatio < BLINK_THRESHOLD;
       const rightBlink = rightEyeRatio < BLINK_THRESHOLD;
-      const bothEyesBlink = leftBlink && rightBlink;
       
+      // More flexible blink detection: either both eyes blink OR one eye blinks significantly
+      const bothEyesBlink = leftBlink && rightBlink;
+      const strongSingleBlink = (leftEyeRatio < BLINK_THRESHOLD * 0.8) || (rightEyeRatio < BLINK_THRESHOLD * 0.8);
+      const anyBlinkDetected = bothEyesBlink || strongSingleBlink;
+      
+      // Track previous state for edge detection
       const wasOpen = !lastBlinkState.left && !lastBlinkState.right;
-      const nowClosed = bothEyesBlink;
+      const nowClosed = anyBlinkDetected;
       const currentTime = Date.now();
       
+      // Detect blink: was open, now closed, and enough time has passed
       if (nowClosed && wasOpen && (currentTime - lastBlinkTime) > BLINK_COOLDOWN) {
         createBlinkCircle();
+        changePlaneColor();
         lastBlinkTime = currentTime;
-        console.log('Blink detected!');
+        console.log(`Blink detected! L:${leftEyeRatio.toFixed(3)} R:${rightEyeRatio.toFixed(3)}`);
       }
       
       lastBlinkState.left = leftBlink;
@@ -393,9 +400,11 @@ function onResults(results, meshCtx, meshCanvas) {
       const filteredHeadTiltMovement = applyMovementThreshold(rawHeadTiltMovement);
       const filteredHeadRollMovement = applyRollThreshold(rawHeadRollMovement);
 
-      // Update cube movement based on filtered head movements
-      const forwardMovement = filteredHeadTiltMovement * BASE_MOVEMENT_SPEED * movementSensitivity;
-      const rightMovement = -filteredHeadRollMovement * BASE_MOVEMENT_SPEED * rollSensitivity;
+      // Apply different acceleration curves for forward/backward vs left/right movement
+      const acceleratedTiltMovement = applyAccelerationCurve(filteredHeadTiltMovement);
+      const acceleratedRollMovement = applyRollAccelerationCurve(filteredHeadRollMovement);
+      const forwardMovement = acceleratedTiltMovement * BASE_MOVEMENT_SPEED * movementSensitivity;
+      const rightMovement = -acceleratedRollMovement * BASE_MOVEMENT_SPEED * rollSensitivity;
       
       if (cameraRelativeMovement) {
         // Camera-relative movement: adjust for camera rotation
@@ -429,13 +438,14 @@ function onResults(results, meshCtx, meshCanvas) {
       const filteredCameraInput = applyTurnThreshold(headTurnAngle);
       
       if (cameraRelativeMovement) {
-        // Accumulate camera rotation instead of direct mapping
+        // Accumulate camera rotation with acceleration curve
         if (Math.abs(filteredCameraInput) > 0) {
+          const acceleratedCameraInput = applyTurnAccelerationCurve(filteredCameraInput);
           const rotationDirection = invertCameraControls ? -1 : 1;
-          cameraRotationY += filteredCameraInput * CAMERA_ROTATION_SPEED * cameraSensitivity * rotationDirection;
+          cameraRotationY += acceleratedCameraInput * CAMERA_ROTATION_SPEED * cameraSensitivity * rotationDirection;
         }
       } else {
-        // Direct mapping mode (original behavior)
+        // Direct mapping mode (original behavior) - no acceleration curve for world space
         const cameraRotation = (invertCameraControls ? -filteredCameraInput : filteredCameraInput) * cameraSensitivity;
         cameraRotationY = cameraRotation;
       }
@@ -549,6 +559,52 @@ function applyTurnThreshold(rawTurn) {
   // Apply smooth scaling above threshold to avoid sudden jumps
   const scaledTurn = rawTurn - (Math.sign(rawTurn) * TURN_THRESHOLD);
   return scaledTurn * THRESHOLD_SMOOTHING;
+}
+
+function applyAccelerationCurve(movement) {
+  // Apply non-linear acceleration curve: slow near center, fast when tilted far
+  const absMovement = Math.abs(movement);
+  
+  if (absMovement === 0) {
+    return 0;
+  }
+  
+  // Gentle acceleration curve: movement^1.2 for subtle acceleration
+  // The further from center, the more acceleration applied
+  const accelerationFactor = Math.pow(absMovement, 2.5); // Power of 1.2 for gentle, subtle curve
+  
+  // Preserve the original direction (sign)
+  return Math.sign(movement) * accelerationFactor;
+}
+
+function applyRollAccelerationCurve(movement) {
+  // Apply even gentler acceleration curve for left/right movement
+  const absMovement = Math.abs(movement);
+  
+  if (absMovement === 0) {
+    return 0;
+  }
+  
+  // Very gentle curve for roll movement since it's naturally more sensitive
+  const accelerationFactor = Math.pow(absMovement, 1.1); // Power of 1.1 for very subtle curve
+  
+  // Preserve the original direction (sign)
+  return Math.sign(movement) * accelerationFactor;
+}
+
+function applyTurnAccelerationCurve(movement) {
+  // Apply acceleration curve for head turn (camera rotation)
+  const absMovement = Math.abs(movement);
+  
+  if (absMovement === 0) {
+    return 0;
+  }
+  
+  // Moderate curve for camera turn - responsive but controlled
+  const accelerationFactor = Math.pow(absMovement, 2.0); // Power of 1.3 for camera rotation
+  
+  // Preserve the original direction (sign)
+  return Math.sign(movement) * accelerationFactor;
 }
 
 // =============================================================================
@@ -882,6 +938,16 @@ function updateWowTexts() {
   // Keeping function for compatibility
 }
 
+function changePlaneColor() {
+  // Generate a random color
+  const randomColor = Math.random() * 0xffffff;
+  
+  // Change the ground plane material color
+  ground.material.color.setHex(randomColor);
+  
+  console.log(`Plane color changed to: #${randomColor.toString(16).padStart(6, '0')}`);
+}
+
 function createBlinkCircle() {
   const circle = {
     geometry: new THREE.CircleGeometry(0.1, 32),
@@ -1161,6 +1227,25 @@ function initializeSensitivityControls() {
     cameraRelativeToggle.addEventListener('change', (event) => {
       cameraRelativeMovement = event.target.checked;
       console.log(`Camera-relative movement: ${cameraRelativeMovement}`);
+      
+      // Set different default camera sensitivity based on mode
+      if (cameraRelativeMovement) {
+        cameraSensitivity = 2.0; // Higher sensitivity for camera-relative mode
+      } else {
+        cameraSensitivity = 1.5; // Lower sensitivity for world coordinate mode
+      }
+      
+      // Update the UI slider and display
+      const cameraSensitivitySlider = document.getElementById('camera-sensitivity-slider');
+      const cameraSensitivityValue = document.getElementById('camera-sensitivity-value');
+      if (cameraSensitivitySlider) {
+        cameraSensitivitySlider.value = cameraSensitivity;
+      }
+      if (cameraSensitivityValue) {
+        cameraSensitivityValue.textContent = `${cameraSensitivity.toFixed(1)}x`;
+      }
+      
+      console.log(`Camera sensitivity updated to: ${cameraSensitivity}x for ${cameraRelativeMovement ? 'camera-relative' : 'world coordinate'} mode`);
       
       // Reset camera rotation when switching modes to avoid confusion
       if (!cameraRelativeMovement) {
