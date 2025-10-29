@@ -56,12 +56,12 @@ const geometry = new THREE.BoxGeometry();
 
 // Create materials for each face of the cube
 const materials = [
-  new THREE.MeshBasicMaterial({ color: 0xff0000 }), // Right face - Red
-  new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Left face - Green  
-  new THREE.MeshBasicMaterial({ color: 0x0000ff }), // Top face - Blue
-  new THREE.MeshBasicMaterial({ color: 0xffff00 }), // Bottom face - Yellow
-  new THREE.MeshBasicMaterial({ color: 0xff00ff }), // Front face - Magenta
-  new THREE.MeshBasicMaterial({ color: 0x00ffff })  // Back face - Cyan
+  new THREE.MeshBasicMaterial({ color: 0xff8f8f }), // Right face - Light Pink rgb(255, 143, 143)
+  new THREE.MeshBasicMaterial({ color: 0xfff1cb }), // Left face - Light Yellow rgb(255, 241, 203)
+  new THREE.MeshBasicMaterial({ color: 0xc2e2fa }), // Top face - Light Blue rgb(194, 226, 250)
+  new THREE.MeshBasicMaterial({ color: 0xb7a3e3 }), // Bottom face - Light Purple rgb(183, 163, 227)
+  new THREE.MeshBasicMaterial({ color: 0xf5d2d2 }), // Front face - Pale Pink rgb(245, 210, 210)
+  new THREE.MeshBasicMaterial({ color: 0xffc7a7 })  // Back face - Light Orange rgb(255, 199, 167)
 ];
 
 const cube = new THREE.Mesh(geometry, materials);

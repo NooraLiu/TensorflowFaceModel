@@ -6,10 +6,10 @@ Two real-time face tracking applications that allow you to control 3D objects us
 
 ## Applications Overview
 
-### **Application 1: Basic Face Tracking (`index.html` + `sketch.js`)**
+### **Application 1: Basic Face Tracking (`index.html` + `basic-app.js`)**
 A foundational face tracking application for learning and experimentation.
 
-### **Application 2: Advanced Movement Control (`movement.html` + `sketch-movement.js`)**
+### **Application 2: Advanced Movement Control (`movement.html` + `advanced-app.js`)**
 A comprehensive face-controlled 3D movement system with advanced features and UI controls.
 
 ---
@@ -208,10 +208,10 @@ cubeVelocity.z *= 0.95;                // Z-axis damping
 
 ## Customization
 
-### **Basic Face Tracking** (`sketch.js`)
+### **Basic Face Tracking** (`basic-app.js`)
 Modify variables like `BLINK_THRESHOLD`, `CALIBRATION_SAMPLES`, and facial landmark indices to customize detection sensitivity and behavior.
 
-### **Advanced Movement Control** (`sketch-movement.js`)
+### **Advanced Movement Control** (`advanced-app.js`)
 You can modify colors, thresholds, acceleration curves, and behaviors by editing the variables listed above. The application is designed to be easily customizable for different users and use cases.
 
 ## File Structure
@@ -219,9 +219,11 @@ You can modify colors, thresholds, acceleration curves, and behaviors by editing
 ```
 TensorflowFaceModel/
 ├── index.html              # Basic face tracking application
-├── sketch.js               # Basic face tracking logic
+├── basic-app.js             # Basic face tracking logic (library-based)
 ├── movement.html           # Advanced movement control application  
-├── sketch-movement.js      # Advanced movement control logic
+├── advanced-app.js         # Advanced movement control logic (library-based)
+├── lib/
+│   └── FaceTrackingLibrary.js  # Core face tracking library with all classes
 └── README.md              # This documentation
 ```
 

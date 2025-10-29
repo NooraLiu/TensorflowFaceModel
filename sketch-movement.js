@@ -2,6 +2,476 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // =============================================================================
+// CLASS DEFINITIONS
+// =============================================================================
+
+class CalibrationSystem {
+  constructor() {
+    this.eyebrowBaseline = null;
+    this.eyebrowReadings = [];
+    this.headTurnBaseline = null;
+    this.headTiltBaseline = null;
+    this.headRollBaseline = null;
+    this.headTurnReadings = [];
+    this.headTiltReadings = [];
+    this.headRollReadings = [];
+    this.isCalibrated = false;
+    this.CALIBRATION_SAMPLES = 30;
+  }
+
+  addSample(eyebrowRatio, headTurn, headTilt, headRoll) {
+    this.eyebrowReadings.push(eyebrowRatio);
+    this.headTurnReadings.push(headTurn);
+    this.headTiltReadings.push(headTilt);
+    this.headRollReadings.push(headRoll);
+    
+    if (this.eyebrowReadings.length >= this.CALIBRATION_SAMPLES) {
+      this.calculateBaselines();
+      this.isCalibrated = true;
+    }
+  }
+
+  calculateBaselines() {
+    this.eyebrowReadings.sort((a, b) => a - b);
+    this.headTurnReadings.sort((a, b) => a - b);
+    this.headTiltReadings.sort((a, b) => a - b);
+    this.headRollReadings.sort((a, b) => a - b);
+    
+    this.eyebrowBaseline = this.eyebrowReadings[Math.floor(this.eyebrowReadings.length / 2)];
+    this.headTurnBaseline = this.headTurnReadings[Math.floor(this.headTurnReadings.length / 2)];
+    this.headTiltBaseline = this.headTiltReadings[Math.floor(this.headTiltReadings.length / 2)];
+    this.headRollBaseline = this.headRollReadings[Math.floor(this.headRollReadings.length / 2)];
+  }
+
+  getProgress() {
+    return Math.round((this.eyebrowReadings.length / this.CALIBRATION_SAMPLES) * 100);
+  }
+}
+
+class GestureDetector {
+  constructor(calibrationSystem) {
+    this.calibration = calibrationSystem;
+    this.lastBlinkState = { left: false, right: false };
+    this.lastBlinkTime = 0;
+    this.BLINK_THRESHOLD = 0.3;
+    this.BLINK_COOLDOWN = 100;
+    this.EYEBROW_THRESHOLD = 1.75;
+    this.HEAD_POSE_CONSTRAINT = 0.05;
+    this.SMILE_THRESHOLD = 0.02;
+    
+    // History tracking
+    this.leftEyebrowRatioHistory = [];
+    this.rightEyebrowRatioHistory = [];
+    this.avgEyebrowRatioHistory = [];
+    this.smileHistory = [];
+    this.EYEBROW_HISTORY_SIZE = 10;
+    this.SMILE_HISTORY_SIZE = 5;
+  }
+
+  detectBlink(landmarks) {
+    const leftEyeTop = landmarks[159];
+    const leftEyeBottom = landmarks[145];
+    const rightEyeTop = landmarks[386];
+    const rightEyeBottom = landmarks[374];
+    const leftEyeLeft = landmarks[33];
+    const leftEyeRight = landmarks[133];
+    const rightEyeLeft = landmarks[362];
+    const rightEyeRight = landmarks[263];
+
+    const leftEyeHeight = Math.abs(leftEyeTop.y - leftEyeBottom.y);
+    const rightEyeHeight = Math.abs(rightEyeTop.y - rightEyeBottom.y);
+    const leftEyeWidth = Math.abs(leftEyeRight.x - leftEyeLeft.x);
+    const rightEyeWidth = Math.abs(rightEyeRight.x - rightEyeLeft.x);
+    
+    const leftEyeRatio = leftEyeHeight / leftEyeWidth;
+    const rightEyeRatio = rightEyeHeight / rightEyeWidth;
+    
+    const leftBlink = leftEyeRatio < this.BLINK_THRESHOLD;
+    const rightBlink = rightEyeRatio < this.BLINK_THRESHOLD;
+    
+    const bothEyesBlink = leftBlink && rightBlink;
+    const strongSingleBlink = (leftEyeRatio < this.BLINK_THRESHOLD * 0.8) || (rightEyeRatio < this.BLINK_THRESHOLD * 0.8);
+    const anyBlinkDetected = bothEyesBlink || strongSingleBlink;
+    
+    const wasOpen = !this.lastBlinkState.left && !this.lastBlinkState.right;
+    const nowClosed = anyBlinkDetected;
+    const currentTime = Date.now();
+    
+    let blinkDetected = false;
+    if (nowClosed && wasOpen && (currentTime - this.lastBlinkTime) > this.BLINK_COOLDOWN) {
+      blinkDetected = true;
+      this.lastBlinkTime = currentTime;
+    }
+    
+    this.lastBlinkState.left = leftBlink;
+    this.lastBlinkState.right = rightBlink;
+    
+    return blinkDetected;
+  }
+
+  detectEyebrowRaise(landmarks, headPose) {
+    if (!this.calibration.isCalibrated) return false;
+    
+    // Check head pose constraint
+    const headTurnDiff = Math.abs(headPose.turn - this.calibration.headTurnBaseline);
+    const headTiltDiff = Math.abs(headPose.tilt - this.calibration.headTiltBaseline);
+    
+    if (headTurnDiff > this.HEAD_POSE_CONSTRAINT || headTiltDiff > this.HEAD_POSE_CONSTRAINT) {
+      return false;
+    }
+    
+    const leftEyebrowBottom = landmarks[55];
+    const rightEyebrowBottom = landmarks[285];
+    const leftEyeLowerLid = landmarks[145];
+    const rightEyeLowerLid = landmarks[374];
+    
+    const leftEyebrowDistance = Math.abs(leftEyebrowBottom.y - leftEyeLowerLid.y);
+    const rightEyebrowDistance = Math.abs(rightEyebrowBottom.y - rightEyeLowerLid.y);
+    const avgEyebrowDistance = (leftEyebrowDistance + rightEyebrowDistance) / 2;
+    
+    this.updateEyebrowHistory(leftEyebrowDistance, rightEyebrowDistance, avgEyebrowDistance);
+    
+    if (this.avgEyebrowRatioHistory.length < 3) return false;
+    
+    const baseline = this.calibration.eyebrowBaseline || 0.05;
+    const currentRatio = avgEyebrowDistance;
+    const eyebrowRaiseAmount = currentRatio - baseline;
+    
+    return eyebrowRaiseAmount > this.EYEBROW_THRESHOLD * baseline;
+  }
+
+  detectSmile(landmarks) {
+    const leftCorner = landmarks[61];
+    const rightCorner = landmarks[291];
+    const upperLip = landmarks[13];
+    const lowerLip = landmarks[14];
+    
+    const mouthWidth = Math.abs(rightCorner.x - leftCorner.x);
+    const mouthHeight = Math.abs(upperLip.y - lowerLip.y);
+    
+    const leftCornerElevation = (leftCorner.y - upperLip.y) / mouthWidth;
+    const rightCornerElevation = (rightCorner.y - upperLip.y) / mouthWidth;
+    const avgCornerElevation = (leftCornerElevation + rightCornerElevation) / 2;
+    
+    this.updateSmileHistory(avgCornerElevation);
+    
+    if (this.smileHistory.length < 3) return { isSmiling: false, intensity: 0 };
+    
+    const avgElevation = this.smileHistory.reduce((sum, val) => sum + val, 0) / this.smileHistory.length;
+    const isSmiling = avgElevation < -this.SMILE_THRESHOLD;
+    const intensity = Math.abs(Math.min(avgElevation + this.SMILE_THRESHOLD, 0)) * 50;
+    
+    return { isSmiling, intensity: Math.min(intensity, 1.0) };
+  }
+
+  updateEyebrowHistory(leftRatio, rightRatio, avgRatio) {
+    this.leftEyebrowRatioHistory.push(leftRatio);
+    this.rightEyebrowRatioHistory.push(rightRatio);
+    this.avgEyebrowRatioHistory.push(avgRatio);
+    
+    if (this.leftEyebrowRatioHistory.length > this.EYEBROW_HISTORY_SIZE) {
+      this.leftEyebrowRatioHistory.shift();
+      this.rightEyebrowRatioHistory.shift();
+      this.avgEyebrowRatioHistory.shift();
+    }
+  }
+
+  updateSmileHistory(cornerElevation) {
+    this.smileHistory.push(cornerElevation);
+    if (this.smileHistory.length > this.SMILE_HISTORY_SIZE) {
+      this.smileHistory.shift();
+    }
+  }
+}
+
+class MovementController {
+  constructor() {
+    this.position = { x: 0, y: 1, z: 0 };
+    this.velocity = { x: 0, y: 0, z: 0 };
+    this.cameraRotationY = 0;
+    
+    // Sensitivity settings
+    this.movementSensitivity = 0.3;
+    this.rollSensitivity = 0.10;
+    this.cameraSensitivity = 2.0;
+    
+    // Movement constants
+    this.BASE_MOVEMENT_SPEED = 0.05;
+    this.CAMERA_ROTATION_SPEED = 2.0;
+    this.MOVEMENT_THRESHOLD = 0.015;
+    this.TURN_THRESHOLD = 0.08;
+    this.ROLL_THRESHOLD = 0.02;
+    this.THRESHOLD_SMOOTHING = 3.0;
+    
+    // Movement mode settings
+    this.cameraRelativeMovement = true;
+    this.invertCameraControls = false;
+  }
+
+  applyMovementThreshold(rawMovement) {
+    if (Math.abs(rawMovement) < this.MOVEMENT_THRESHOLD) {
+      return 0;
+    }
+    const scaledMovement = rawMovement - (Math.sign(rawMovement) * this.MOVEMENT_THRESHOLD);
+    return scaledMovement * this.THRESHOLD_SMOOTHING;
+  }
+
+  applyRollThreshold(rawMovement) {
+    if (Math.abs(rawMovement) < this.ROLL_THRESHOLD) {
+      return 0;
+    }
+    const scaledMovement = rawMovement - (Math.sign(rawMovement) * this.ROLL_THRESHOLD);
+    return scaledMovement * this.THRESHOLD_SMOOTHING;
+  }
+
+  applyTurnThreshold(rawTurn) {
+    const absTurn = Math.abs(rawTurn);
+    if (absTurn < this.TURN_THRESHOLD) {
+      return 0;
+    }
+    const scaledTurn = rawTurn - (Math.sign(rawTurn) * this.TURN_THRESHOLD);
+    return scaledTurn * this.THRESHOLD_SMOOTHING;
+  }
+
+  applyAccelerationCurve(movement) {
+    const absMovement = Math.abs(movement);
+    if (absMovement === 0) return 0;
+    
+    const accelerationFactor = Math.pow(absMovement, 1.2);
+    return Math.sign(movement) * accelerationFactor;
+  }
+
+  applyRollAccelerationCurve(movement) {
+    const absMovement = Math.abs(movement);
+    if (absMovement === 0) return 0;
+    
+    const accelerationFactor = Math.pow(absMovement, 1.1);
+    return Math.sign(movement) * accelerationFactor;
+  }
+
+  applyTurnAccelerationCurve(movement) {
+    const absMovement = Math.abs(movement);
+    if (absMovement === 0) return 0;
+    
+    const accelerationFactor = Math.pow(absMovement, 1.3);
+    return Math.sign(movement) * accelerationFactor;
+  }
+
+  updateMovement(headMovement, cube) {
+    const filteredHeadTurnAngle = this.applyTurnThreshold(headMovement.turn);
+    const filteredHeadTiltMovement = this.applyMovementThreshold(headMovement.tilt);
+    const filteredHeadRollMovement = this.applyRollThreshold(headMovement.roll);
+
+    const acceleratedTiltMovement = this.applyAccelerationCurve(filteredHeadTiltMovement);
+    const acceleratedRollMovement = this.applyRollAccelerationCurve(filteredHeadRollMovement);
+    const forwardMovement = acceleratedTiltMovement * this.BASE_MOVEMENT_SPEED * this.movementSensitivity;
+    const rightMovement = -acceleratedRollMovement * this.BASE_MOVEMENT_SPEED * this.rollSensitivity;
+    
+    if (this.cameraRelativeMovement) {
+      const cosRotation = Math.cos(this.cameraRotationY);
+      const sinRotation = Math.sin(this.cameraRotationY);
+      
+      this.velocity.z += forwardMovement * cosRotation - rightMovement * sinRotation;
+      this.velocity.x += forwardMovement * sinRotation + rightMovement * cosRotation;
+    } else {
+      this.velocity.z += forwardMovement;
+      this.velocity.x += rightMovement;
+    }
+
+    // Camera rotation
+    const filteredCameraInput = this.applyTurnThreshold(headMovement.turn);
+    
+    if (this.cameraRelativeMovement) {
+      if (Math.abs(filteredCameraInput) > 0) {
+        const acceleratedCameraInput = this.applyTurnAccelerationCurve(filteredCameraInput);
+        const rotationDirection = this.invertCameraControls ? -1 : 1;
+        this.cameraRotationY += acceleratedCameraInput * this.CAMERA_ROTATION_SPEED * this.cameraSensitivity * rotationDirection;
+      }
+    } else {
+      const cameraRotation = (this.invertCameraControls ? -filteredCameraInput : filteredCameraInput) * this.cameraSensitivity;
+      this.cameraRotationY = cameraRotation;
+    }
+
+    // Apply velocity damping
+    this.velocity.x *= 0.95;
+    this.velocity.y *= 0.90;
+    this.velocity.z *= 0.95;
+
+    // Update position
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+    this.position.z += this.velocity.z;
+
+    // Update cube position
+    cube.position.set(this.position.x, this.position.y, this.position.z);
+  }
+
+  updateCameraFollow(camera) {
+    const CUBE_FOLLOW_DISTANCE = 5;
+    const CUBE_HEIGHT_OFFSET = 2;
+    
+    const distance = CUBE_FOLLOW_DISTANCE;
+    const rotatedDistance = distance;
+    
+    const targetCameraX = this.position.x + Math.sin(this.cameraRotationY) * rotatedDistance;
+    const targetCameraY = this.position.y + CUBE_HEIGHT_OFFSET;
+    const targetCameraZ = this.position.z + Math.cos(this.cameraRotationY) * rotatedDistance;
+    
+    camera.position.set(targetCameraX, targetCameraY, targetCameraZ);
+    camera.lookAt(this.position.x, this.position.y, this.position.z);
+  }
+
+  setSensitivity(type, value) {
+    switch(type) {
+      case 'movement':
+        this.movementSensitivity = value;
+        break;
+      case 'roll':
+        this.rollSensitivity = value;
+        break;
+      case 'camera':
+        this.cameraSensitivity = value;
+        break;
+    }
+  }
+
+  setMode(cameraRelative) {
+    this.cameraRelativeMovement = cameraRelative;
+    if (cameraRelative) {
+      this.cameraSensitivity = 2.0;
+    } else {
+      this.cameraSensitivity = 1.5;
+      this.cameraRotationY = 0;
+    }
+  }
+}
+
+class VisualEffects {
+  constructor(scene) {
+    this.scene = scene;
+    this.ground = null;
+    this.smileCanvas = null;
+    this.smileCtx = null;
+    this.blinkCircles = [];
+    this.wowTexts = [];
+    this.setupGround();
+    this.setupSmileCanvas();
+  }
+
+  setupGround() {
+    const groundGeometry = new THREE.PlaneGeometry(20, 20);
+    const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x90EE90 });
+    this.ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    this.ground.rotation.x = -Math.PI / 2;
+    this.ground.receiveShadow = true;
+    this.scene.add(this.ground);
+  }
+
+  setupSmileCanvas() {
+    this.smileCanvas = document.createElement('canvas');
+    this.smileCanvas.width = 300;
+    this.smileCanvas.height = 150;
+    this.smileCanvas.style.position = 'absolute';
+    this.smileCanvas.style.left = '20px';
+    this.smileCanvas.style.bottom = '120px';
+    this.smileCanvas.style.border = '2px solid white';
+    this.smileCanvas.style.borderRadius = '10px';
+    this.smileCanvas.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    this.smileCanvas.style.zIndex = '1000';
+    document.body.appendChild(this.smileCanvas);
+    this.smileCtx = this.smileCanvas.getContext('2d');
+  }
+
+  changePlaneColor() {
+    // Array of your specified colors
+    const colors = [
+      0xecf4e8, // rgb(236, 244, 232)
+      0xcbf3bb, // rgb(203, 243, 187)
+      0xabe7b2, // rgb(171, 231, 178)
+      0x93bfc7  // rgb(147, 191, 199)
+    ];
+    
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    this.ground.material.color.setHex(randomColor);
+    console.log(`Plane color changed to: #${randomColor.toString(16).padStart(6, '0')}`);
+  }
+
+  createBlinkCircle() {
+    const circle = {
+      geometry: new THREE.CircleGeometry(0.1, 32),
+      material: new THREE.MeshBasicMaterial({ 
+        color: Math.random() * 0xffffff,
+        transparent: true,
+        opacity: 1.0
+      }),
+      position: {
+        x: (Math.random() - 0.5) * 4,
+        y: (Math.random() - 0.5) * 4,
+        z: (Math.random() - 0.5) * 2
+      },
+      age: 0,
+      maxAge: 180
+    };
+    
+    circle.mesh = new THREE.Mesh(circle.geometry, circle.material);
+    circle.mesh.position.set(circle.position.x, circle.position.y, circle.position.z);
+    this.scene.add(circle.mesh);
+    this.blinkCircles.push(circle);
+  }
+
+  updateBlinkCircles() {
+    for (let i = this.blinkCircles.length - 1; i >= 0; i--) {
+      const circle = this.blinkCircles[i];
+      circle.age++;
+      
+      const fadeProgress = circle.age / circle.maxAge;
+      circle.material.opacity = Math.max(0, 1 - fadeProgress);
+      circle.mesh.position.y += 0.005;
+      
+      if (circle.age >= circle.maxAge) {
+        this.scene.remove(circle.mesh);
+        circle.geometry.dispose();
+        circle.material.dispose();
+        this.blinkCircles.splice(i, 1);
+      }
+    }
+  }
+
+  updateSmileCurve(smileIntensity) {
+    if (!this.smileCtx) return;
+    
+    this.smileCtx.clearRect(0, 0, this.smileCanvas.width, this.smileCanvas.height);
+    
+    if (smileIntensity <= 0) return;
+    
+    const centerX = this.smileCanvas.width / 2;
+    const centerY = this.smileCanvas.height / 2;
+    const curveWidth = 100 * smileIntensity;
+    const curveHeight = 30 * smileIntensity;
+    
+    this.smileCtx.strokeStyle = `hsl(${120 * smileIntensity}, 100%, 50%)`;
+    this.smileCtx.lineWidth = 3;
+    this.smileCtx.beginPath();
+    this.smileCtx.arc(centerX, centerY - curveHeight/2, curveWidth/2, 0, Math.PI);
+    this.smileCtx.stroke();
+    
+    this.smileCtx.fillStyle = 'white';
+    this.smileCtx.font = '16px Arial';
+    this.smileCtx.textAlign = 'center';
+    this.smileCtx.fillText(`Smile: ${(smileIntensity * 100).toFixed(0)}%`, centerX, centerY + 40);
+  }
+}
+
+// =============================================================================
+// GLOBAL INSTANCES
+// =============================================================================
+
+const calibrationSystem = new CalibrationSystem();
+const gestureDetector = new GestureDetector(calibrationSystem);
+const movementController = new MovementController();
+let visualEffects = null; // Will be initialized after scene setup
+
+// =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
 
@@ -93,7 +563,8 @@ const CAMERA_DISTANCE = 8;
 let cameraRotationY = 0; // Camera Y-axis rotation from head turns
 let invertCameraControls = true; // Toggle for camera control direction (default: inverted)
 const CAMERA_ROTATION_SPEED = 0.02; // Speed of camera rotation accumulation
-let cameraRelativeMovement = true; // Toggle for camera-relative vs world-coordinate movement
+// Movement mode settings - now handled by MovementController class
+// let cameraRelativeMovement = true; // Moved to MovementController class
 
 // =============================================================================
 // SMILE DETECTION SYSTEM
@@ -154,12 +625,12 @@ scene.add(ground);
 // Create cube with colored faces
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 const cubeMaterials = [
-  new THREE.MeshPhongMaterial({ color: 0xff0000 }), // Right face - Red
-  new THREE.MeshPhongMaterial({ color: 0x00ff00 }), // Left face - Green  
-  new THREE.MeshPhongMaterial({ color: 0x0000ff }), // Top face - Blue
-  new THREE.MeshPhongMaterial({ color: 0xffff00 }), // Bottom face - Yellow
-  new THREE.MeshPhongMaterial({ color: 0xff00ff }), // Front face - Magenta
-  new THREE.MeshPhongMaterial({ color: 0x00ffff })  // Back face - Cyan
+  new THREE.MeshPhongMaterial({ color: 0xff8f8f }), // Right face - Light Pink rgb(255, 143, 143)
+  new THREE.MeshPhongMaterial({ color: 0xfff1cb }), // Left face - Light Yellow rgb(255, 241, 203)
+  new THREE.MeshPhongMaterial({ color: 0xc2e2fa }), // Top face - Light Blue rgb(194, 226, 250)
+  new THREE.MeshPhongMaterial({ color: 0xb7a3e3 }), // Bottom face - Light Purple rgb(183, 163, 227)
+  new THREE.MeshPhongMaterial({ color: 0xf5d2d2 }), // Front face - Pale Pink rgb(245, 210, 210)
+  new THREE.MeshPhongMaterial({ color: 0xffc7a7 })  // Back face - Light Orange rgb(255, 199, 167)
 ];
 const cube = new THREE.Mesh(cubeGeometry, cubeMaterials);
 cube.position.set(0, 0.5, 0);
@@ -167,10 +638,10 @@ cube.castShadow = true;
 scene.add(cube);
 
 // Add lighting
-const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Bright white ambient light
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
 directionalLight.position.set(10, 10, 5);
 directionalLight.castShadow = true;
 directionalLight.shadow.mapSize.width = 2048;
@@ -406,7 +877,7 @@ function onResults(results, meshCtx, meshCanvas) {
       const forwardMovement = acceleratedTiltMovement * BASE_MOVEMENT_SPEED * movementSensitivity;
       const rightMovement = -acceleratedRollMovement * BASE_MOVEMENT_SPEED * rollSensitivity;
       
-      if (cameraRelativeMovement) {
+      if (movementController.cameraRelativeMovement) {
         // Camera-relative movement: adjust for camera rotation
         const cosRotation = Math.cos(cameraRotationY);
         const sinRotation = Math.sin(cameraRotationY);
@@ -437,7 +908,7 @@ function onResults(results, meshCtx, meshCanvas) {
       // Apply other controls
       const filteredCameraInput = applyTurnThreshold(headTurnAngle);
       
-      if (cameraRelativeMovement) {
+      if (movementController.cameraRelativeMovement) {
         // Accumulate camera rotation with acceleration curve
         if (Math.abs(filteredCameraInput) > 0) {
           const acceleratedCameraInput = applyTurnAccelerationCurve(filteredCameraInput);
@@ -939,8 +1410,15 @@ function updateWowTexts() {
 }
 
 function changePlaneColor() {
-  // Generate a random color
-  const randomColor = Math.random() * 0xffffff;
+  // Array of your specified colors
+  const colors = [
+    0xecf4e8, // rgb(236, 244, 232)
+    0xcbf3bb, // rgb(203, 243, 187)
+    0xabe7b2, // rgb(171, 231, 178)
+    0x93bfc7  // rgb(147, 191, 199)
+  ];
+  
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
   
   // Change the ground plane material color
   ground.material.color.setHex(randomColor);
@@ -1178,21 +1656,21 @@ function initializeSensitivityControls() {
   if (sensitivitySlider && sensitivityValue) {
     // Update forward/back sensitivity when slider changes
     sensitivitySlider.addEventListener('input', (event) => {
-      movementSensitivity = parseFloat(event.target.value);
-      sensitivityValue.textContent = `${movementSensitivity.toFixed(1)}x`;
-      console.log(`Forward/Back sensitivity updated to: ${movementSensitivity}x`);
+      movementController.setSensitivity('movement', parseFloat(event.target.value));
+      sensitivityValue.textContent = `${movementController.movementSensitivity.toFixed(1)}x`;
+      console.log(`Forward/Back sensitivity updated to: ${movementController.movementSensitivity}x`);
     });
     
     // Initialize display
-    sensitivityValue.textContent = `${movementSensitivity.toFixed(1)}x`;
+    sensitivityValue.textContent = `${movementController.movementSensitivity.toFixed(1)}x`;
   }
   
   if (rollSensitivitySlider && rollSensitivityValue) {
     // Update left/right sensitivity when slider changes
     rollSensitivitySlider.addEventListener('input', (event) => {
-      rollSensitivity = parseFloat(event.target.value);
-      rollSensitivityValue.textContent = `${rollSensitivity.toFixed(2)}x`;
-      console.log(`Left/Right sensitivity updated to: ${rollSensitivity}x`);
+      movementController.setSensitivity('roll', parseFloat(event.target.value));
+      rollSensitivityValue.textContent = `${movementController.rollSensitivity.toFixed(2)}x`;
+      console.log(`Left/Right sensitivity updated to: ${movementController.rollSensitivity}x`);
     });
     
     // Initialize display
@@ -1225,36 +1703,24 @@ function initializeSensitivityControls() {
   if (cameraRelativeToggle) {
     // Update camera-relative movement setting when toggle changes
     cameraRelativeToggle.addEventListener('change', (event) => {
-      cameraRelativeMovement = event.target.checked;
-      console.log(`Camera-relative movement: ${cameraRelativeMovement}`);
-      
-      // Set different default camera sensitivity based on mode
-      if (cameraRelativeMovement) {
-        cameraSensitivity = 2.0; // Higher sensitivity for camera-relative mode
-      } else {
-        cameraSensitivity = 1.5; // Lower sensitivity for world coordinate mode
-      }
+      movementController.setMode(event.target.checked);
+      console.log(`Camera-relative movement: ${movementController.cameraRelativeMovement}`);
       
       // Update the UI slider and display
       const cameraSensitivitySlider = document.getElementById('camera-sensitivity-slider');
       const cameraSensitivityValue = document.getElementById('camera-sensitivity-value');
       if (cameraSensitivitySlider) {
-        cameraSensitivitySlider.value = cameraSensitivity;
+        cameraSensitivitySlider.value = movementController.cameraSensitivity;
       }
       if (cameraSensitivityValue) {
-        cameraSensitivityValue.textContent = `${cameraSensitivity.toFixed(1)}x`;
+        cameraSensitivityValue.textContent = `${movementController.cameraSensitivity.toFixed(1)}x`;
       }
       
-      console.log(`Camera sensitivity updated to: ${cameraSensitivity}x for ${cameraRelativeMovement ? 'camera-relative' : 'world coordinate'} mode`);
-      
-      // Reset camera rotation when switching modes to avoid confusion
-      if (!cameraRelativeMovement) {
-        cameraRotationY = 0;
-      }
+      console.log(`Camera sensitivity updated to: ${movementController.cameraSensitivity}x for ${movementController.cameraRelativeMovement ? 'camera-relative' : 'world coordinate'} mode`);
     });
     
     // Initialize state
-    cameraRelativeToggle.checked = cameraRelativeMovement;
+    cameraRelativeToggle.checked = movementController.cameraRelativeMovement;
   }
 }
 

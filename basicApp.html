@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>FaceMesh + Three.js</title>
+  <title>Basic Face Tracking - Object-Oriented Sketch.js Recreation</title>
   <script type="importmap">
     {
       "imports": {
@@ -64,15 +64,15 @@
   <video id="video" autoplay muted playsinline></video>
   <canvas id="mesh-canvas" width="320" height="240"></canvas>
   <div id="controls">
-    <div><strong>Face Controls:</strong></div>
-    <div>🔄 Head Left/Right: Rotate cube</div>
-    <div>🔄 Head Forward/Back: Tilt cube</div>
-    <div>� Head Side Tilt: Roll cube</div>
-    <div>�📏 Open Mouth: Scale cube size</div>
-    <div>🤨 Raise Eyebrows: Change color/wireframe</div>
-    <div>👁️ Blink: Spawn random colored circles</div>
+    <div><strong>Basic Face Controls (OOP):</strong></div>
+    <div>Head Left/Right: Rotate cube</div>
+    <div>Head Forward/Back: Tilt cube</div>
+    <div>Head Side Tilt: Roll cube</div>
+    <div>Open Mouth: Scale cube size</div>
+    <div>Raise Eyebrows: Toggle wireframe</div>
+    <div>Blink: Spawn colored circles</div>
     <div id="calibration-status" style="margin-top: 8px; color: #FFD700;">
-      🔧 Calibrating face baseline...
+      Calibrating face baseline...
     </div>
     <div style="margin-top: 8px; font-size: 10px;">
       <span style="color: #FFFF00;">●</span> Head tracking<br>
@@ -85,8 +85,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
-  <!-- Your sketch -->
-  <script type="module" src="./sketch.js"></script>
+  <!-- Our Object-Oriented Basic App -->
+  <script type="module" src="./basicApp.js"></script>
   
   <!-- Navigation button -->
   <button id="nav-button" onclick="goToMovementControl()" style="
