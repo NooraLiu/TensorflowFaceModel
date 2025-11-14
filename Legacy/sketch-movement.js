@@ -600,6 +600,15 @@ let lastBlinkTime = 0;
 const BLINK_THRESHOLD = 0.3; // Relaxed threshold for better detection
 const BLINK_COOLDOWN = 100; // Reduced cooldown for more responsive detection
 
+// Blink plane color cycling system
+const planeColors = [
+  0xa3dc9a, // rgb(163, 220, 154)
+  0xdee791, // rgb(222, 231, 145)  
+  0xfff9bd, // rgb(255, 249, 189)
+  0xffd6ba  // rgb(255, 214, 186)
+];
+let currentColorIndex = 0;
+
 // =============================================================================
 // BLINK DETECTION SYSTEM
 // =============================================================================
@@ -616,7 +625,7 @@ let lastSmoothedMouthValue = 1.0;
 
 // Create ground plane
 const groundGeometry = new THREE.PlaneGeometry(20, 20);
-const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x90EE90 }); // Light green
+const groundMaterial = new THREE.MeshLambertMaterial({ color: 0xa3dc9a }); // rgb(163, 220, 154) - first color in cycling palette
 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
 ground.rotation.x = -Math.PI / 2; // Rotate to be horizontal
 ground.receiveShadow = true;
@@ -1410,20 +1419,14 @@ function updateWowTexts() {
 }
 
 function changePlaneColor() {
-  // Array of your specified colors
-  const colors = [
-    0xecf4e8, // rgb(236, 244, 232)
-    0xcbf3bb, // rgb(203, 243, 187)
-    0xabe7b2, // rgb(171, 231, 178)
-    0x93bfc7  // rgb(147, 191, 199)
-  ];
-  
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  // Cycle to next color in the array
+  currentColorIndex = (currentColorIndex + 1) % planeColors.length;
+  const newColor = planeColors[currentColorIndex];
   
   // Change the ground plane material color
-  ground.material.color.setHex(randomColor);
+  ground.material.color.setHex(newColor);
   
-  console.log(`Plane color changed to: #${randomColor.toString(16).padStart(6, '0')}`);
+  console.log(`Plane color cycled to: #${newColor.toString(16).padStart(6, '0')} (index ${currentColorIndex})`);
 }
 
 function createBlinkCircle() {
