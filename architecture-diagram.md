@@ -143,8 +143,8 @@ classDiagram
     }
     
     class ExpressionData {
-        +smile: {detected, intensity}
-        +frown: {detected, intensity}
+        +smile: Object
+        +frown: Object
         +isSymmetrical: boolean
     }
     
