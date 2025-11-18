@@ -1,4 +1,4 @@
-# Face Tracking 3D Cube Controller
+# Face Tracking 3D Controller
 
 A modular face tracking system that uses your webcam and facial expressions to control 3D objects in real-time using MediaPipe and Three.js.
 
