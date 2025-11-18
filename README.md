@@ -14,7 +14,7 @@ A modular face tracking system that uses your webcam and facial expressions to c
 - **Auto-Calibration** - Establishes neutral baseline on startup
 - **Modular Architecture** - Reusable detector modules for multiple examples
 
-## Two Interactive Examples
+## Three Interactive Examples
 
 ### 1. Rotation Example (`example_rotation/`)
 - **Head movements** rotate a colorful cube
@@ -29,6 +29,21 @@ A modular face tracking system that uses your webcam and facial expressions to c
 - **Turn head** to change direction
 - **Tilt head** to move forward/backward
 - **Camera follows** the cube smoothly
+
+### 3. Pac-Man Game (`example_pacman/`)
+- **Head tilt** to move forward/backward
+- **Head roll** to strafe left/right and rotate Pac-Man
+- **Open mouth** to collect stars (10 points total)
+- **Avoid ghosts** - 3 lives with visual damage feedback
+- **Avoid bombs** - Lose points on collision with explosion effects
+- **Blink** to switch terrains with different challenges:
+  - **Forest (Green)**: 1 ghost, 5 bombs, standard obstacles (trees)
+  - **Desert (Yellow)**: 0 ghosts, 15 bombs (bomb terrain!), cacti obstacles
+  - **Beach (Light Yellow)**: 1 ghost, 5 bombs, rock obstacles
+  - **Sunset (Purple)**: 3 ghosts (ghost terrain!), 5 bombs, pillar obstacles
+- **Dynamic gameplay**: Pac-Man grows with score, ghosts patrol specific terrains
+- **Win condition**: Collect all stars with positive score
+- **Game over**: Lose all lives or finish with 0 score
 
 ## Quick Start
 
@@ -63,6 +78,7 @@ A modular face tracking system that uses your webcam and facial expressions to c
 3. **Open in browser**:
    - Rotation Example: `http://localhost:8000/example_rotation/`
    - Movement Example: `http://localhost:8000/example_movement/`
+   - Pac-Man Game: `http://localhost:8000/example_pacman/`
 
 4. **Allow camera access** when prompted
 
@@ -97,10 +113,24 @@ TensorflowFaceModel/
 │
 ├── example_movement/                 # Movement control example
 │   ├── index.html
-│   ├── sketch-modular.js
+│   ├── sketch-movement.js
 │   ├── faceTrackingCoordinator.js
 │   ├── dataMapping.js                # MovementController class
-│   └── sceneObjects.js
+│   ├── sceneObjects.js
+│   └── sceneSetup.js
+│
+├── example_pacman/                   # Pac-Man game example
+│   ├── index.html
+│   ├── sketch-pacman.js              # Main game entry point
+│   ├── faceTrackingCoordinator.js    # Game state coordination
+│   ├── dataMapping.js                # MovementController + GroundColorManager
+│   ├── sceneObjects.js               # Pac-Man, ghosts, stars, bombs, obstacles
+│   └── sceneSetup.js                 # Three.js scene configuration
+│
+├── Models/                           # 3D model assets
+│   ├── ghost.glb                     # Ghost model for Pac-Man game
+│   ├── pac-man_ghost_blinky.glb
+│   └── pacman_ghost_inky.glb
 │
 ├── Legacy/                           # Original monolithic version
 │   ├── index.html
@@ -130,7 +160,38 @@ TensorflowFaceModel/
 
 - **[MediaPipe Face Mesh](https://google.github.io/mediapipe/solutions/face_mesh.html)** - Real-time face landmark detection
 - **[Three.js](https://threejs.org/)** - 3D graphics rendering
+- **[GLTFLoader](https://threejs.org/docs/#examples/en/loaders/GLTFLoader)** - 3D model loading (.glb format)
 - **ES6 Modules** - Clean, modular JavaScript architecture
+
+## Game Mechanics (Pac-Man Example)
+
+### Controls
+- **Head Tilt (Forward/Back)**: Move Pac-Man forward/backward
+- **Head Roll (Left/Right)**: Strafe and rotate Pac-Man (0° to 180°)
+- **Head Turn**: Rotate camera view
+- **Mouth Open**: Collect stars (must have mouth open!)
+- **Blink**: Switch between 4 different terrains
+
+### Collectibles & Hazards
+- **Stars (Yellow)** 🌟: +1 point each, must collect with open mouth
+- **Bombs (Black)** 💣: -2 points, explosion effect on collision
+- **Ghosts** 👻: -1 life per collision, flash red damage effect
+
+### Terrain System
+Each terrain has unique characteristics:
+- **Different colors** and visual themes
+- **Different obstacles**: Trees (forest), cacti (desert), rocks (beach), pillars (sunset)
+- **Variable bomb counts**: Desert has 15 bombs, others have 5
+- **Different ghost counts**: Sunset has 3 ghosts, forest/beach have 1, desert has 0
+- **Consistent obstacle positions** per terrain (uses seeded randomization)
+
+### Gameplay Features
+- **Lives System**: Start with 3 hearts ❤️
+- **Size Scaling**: Pac-Man grows bigger with higher score
+- **Collision Detection**: Can't pass through obstacles, slides along edges
+- **Boundaries**: Invisible walls keep Pac-Man on the plane
+- **Visual Effects**: Sparkle bursts for stars, explosions for bombs, flash for ghost hits
+- **Win/Lose**: Win by collecting all stars with score > 0, lose by running out of lives or finishing with 0 score
 
 ## Customization
 

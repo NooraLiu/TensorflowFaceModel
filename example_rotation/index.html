@@ -77,6 +77,26 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.6);
     }
+    #pacman-button {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(135deg, #ffff00 0%, #ffaa00 100%);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      z-index: 1000;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #pacman-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    }
   </style>
 </head>
 <body>
@@ -104,6 +124,10 @@
   <button id="nav-button" onclick="goToMovementControl()">
       Go to Movement Control
   </button>
+  
+  <button id="pacman-button" onclick="goToPacman()">
+      Play Pac-Man!
+  </button>
 
   <!-- Load MediaPipe FaceMesh -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
@@ -115,6 +139,9 @@
   <script>
       function goToMovementControl() {
           window.location.href = '../example_movement/index.html';
+      }
+      function goToPacman() {
+          window.location.href = '../example_pacman/index.html';
       }
   </script>
 </body>
