@@ -1,4 +1,4 @@
-# Face Tracking 3D Controller
+# Face Tracking 3D Cube Controller
 
 A modular face tracking system that uses your webcam and facial expressions to control 3D objects in real-time using MediaPipe and Three.js.
 
@@ -93,7 +93,8 @@ A modular face tracking system that uses your webcam and facial expressions to c
 TensorflowFaceModel/
 │
 ├── lib/                              # Core library
-│   └── MediaPipeFaceTracking.js      # MediaPipe wrapper
+│   ├── faceTrackingSystem.js         # MediaPipe wrapper (MediaPipeFaceTracking class)
+│   └── faceDetectors.js              # Detector factory for creating detector instances
 │
 ├── modules/                          # Shared detector modules
 │   └── detectorModules/
@@ -109,7 +110,8 @@ TensorflowFaceModel/
 │   ├── sketch-modular.js             # Main entry point
 │   ├── faceTrackingCoordinator.js    # Orchestrates detectors
 │   ├── dataMapping.js                # Maps detections to actions
-│   └── sceneObjects.js               # Three.js scene setup
+│   ├── sceneObjects.js               # Three.js objects creation
+│   └── sceneSetup.js                 # Scene configuration
 │
 ├── example_movement/                 # Movement control example
 │   ├── index.html
