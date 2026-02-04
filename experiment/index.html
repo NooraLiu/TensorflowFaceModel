@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face-Controlled Movement - Experiment</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background-color: #111;
+        }
+        
+        #video {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 320px;
+            height: 240px;
+            border: 2px solid #00FF88;
+            border-radius: 8px;
+            z-index: 100;
+            transform: scaleX(-1); /* Mirror the video */
+        }
+        
+        #mesh-canvas {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 320px;
+            height: 240px;
+            border: 2px solid #00FFFF;
+            border-radius: 8px;
+            z-index: 101; /* Higher z-index to appear on top of video */
+            background: transparent; /* Transparent background to see video underneath */
+            pointer-events: none; /* Allow clicks to pass through to video */
+            transform: scaleX(-1); /* Mirror the canvas to match the video */
+        }
+        
+        #error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff4444;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            z-index: 200;
+            display: none;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        #status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #00FF88;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            z-index: 100;
+        }
+        
+        #nav-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        #nav-button:active {
+            transform: translateY(0);
+        }
+        
+        #pacman-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #ffff00 0%, #ffaa00 100%);
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #pacman-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        #pacman-button:active {
+            transform: translateY(0);
+        }
+        
+        /* Pink slider styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff69b4;
+            cursor: pointer;
+            border: 2px solid #ff1493;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff69b4;
+            cursor: pointer;
+            border: 2px solid #ff1493;
+        }
+        
+        input[type="range"]::-webkit-slider-track {
+            background: linear-gradient(to right, #ffb6c1, #ff69b4);
+            height: 8px;
+            border-radius: 5px;
+        }
+        
+        input[type="range"]::-moz-range-track {
+            background: linear-gradient(to right, #ffb6c1, #ff69b4);
+            height: 8px;
+            border-radius: 5px;
+        }
+    </style>
+    
+    <!-- Import map for ES6 modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div id="status">Face tracking initialized - Step 1 complete!</div>
+    
+    <!-- Sensitivity Control UI -->
+    <div id="sensitivity-control" style="position: absolute; top: 70px; left: 10px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; color: white; font-family: Arial, sans-serif; min-width: 200px; z-index: 100;">
+        <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #444;">
+            <div style="font-weight: bold; color: #00FF88; margin-bottom: 8px;">Control Mode</div>
+            <select id="mode-selector" style="width: 100%; padding: 5px; border-radius: 4px; background: #222; color: white; border: 1px solid #00FF88;">
+                <option value="original">Original (Head Tilt/Roll)</option>
+                <option value="head-turn">Head Turn + Mouse</option>
+            </select>
+            <div id="mode-description" style="margin-top: 5px; font-size: 10px; color: #999;">
+                Head tilt: forward/back, Head roll: left/right
+            </div>
+        </div>
+        <div style="margin-bottom: 8px; font-weight: bold; color: #00FF88;">Forward/Back Sensitivity</div>
+        <input type="range" id="sensitivity-slider" min="0.1" max="1.0" step="0.1" value="0.3" style="width: 100%; margin-bottom: 5px;">
+        <div style="text-align: center; font-size: 14px; color: #00FFFF;">
+            <span id="sensitivity-value">0.3x</span>
+        </div>
+        
+        <div style="margin-top: 15px; margin-bottom: 8px; font-weight: bold; color: #00FF88;">Left/Right Sensitivity</div>
+        <input type="range" id="roll-sensitivity-slider" min="0.05" max="0.15" step="0.01" value="0.10" style="width: 100%; margin-bottom: 5px;">
+        <div style="text-align: center; font-size: 14px; color: #00FFFF;">
+            <span id="roll-sensitivity-value">0.10x</span>
+        </div>
+        
+        <div style="margin-top: 15px; margin-bottom: 8px; font-weight: bold; color: #00FF88;">Camera Turn Sensitivity</div>
+        <input type="range" id="camera-sensitivity-slider" min="0" max="3.0" step="0.1" value="2.0" style="width: 100%; margin-bottom: 5px;">
+        <div style="text-align: center; font-size: 14px; color: #00FFFF;">
+            <span id="camera-sensitivity-value">2.0x</span>
+        </div>
+        
+        <div style="margin-top: 8px; font-size: 11px; color: #ccc;">
+            Adjust how responsive the cube movement is to your head tilting
+        </div>
+        
+        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #444;">
+            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #00FF88;">
+                <input type="checkbox" id="invert-camera-toggle" checked style="margin-right: 8px; transform: scale(1.2);">
+                Invert Camera Controls
+            </label>
+            <div style="margin-top: 5px; font-size: 10px; color: #999;">
+                Turn head left → camera goes right
+            </div>
+            
+            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #00FF88; margin-top: 10px;">
+                <input type="checkbox" id="camera-relative-toggle" checked style="margin-right: 8px; transform: scale(1.2);">
+                Camera-Relative Movement
+            </label>
+            <div style="margin-top: 5px; font-size: 10px; color: #999;">
+                Move relative to camera direction vs world coordinates
+            </div>
+            
+            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #00FF88; margin-top: 10px;">
+                <input type="checkbox" id="clamp-camera-toggle" checked style="margin-right: 8px; transform: scale(1.2);">
+                Clamp Camera to Ground
+            </label>
+            <div style="margin-top: 5px; font-size: 10px; color: #999;">
+                Prevent camera from looking below ground level
+            </div>
+        </div>
+    </div>
+    
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="mesh-canvas" width="320" height="240"></canvas>
+    
+    <div id="error"></div>
+    
+    <button id="nav-button" onclick="goToRotationControl()">
+        Back to Rotation Control
+    </button>
+    
+    <button id="pacman-button" onclick="goToPacman()">
+        Play Pac-Man 🎮
+    </button>
+    
+    <!-- MediaPipe scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+    
+    <!-- Main application script -->
+    <script type="module" src="./sketch-movement.js"></script>
+    
+    <script>
+        function goToRotationControl() {
+            window.location.href = '../example_rotation/index.html';
+        }
+        
+        function goToPacman() {
+            window.location.href = '../example_pacman/index.html';
+        }
+    </script>
+</body>
+</html>
