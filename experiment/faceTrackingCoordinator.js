@@ -12,11 +12,9 @@ export function processFaceLandmarks(results, meshCtx, meshCanvas, systems, face
     blinkDetector,
     headPoseDetector,
     eyebrowDetector,
-    smileFrownDetector,
     blinkEffectManager,
     groundColorManager,
     eyebrowEffectManager,
-    smileFrownEffectManager,
     movementController,
     cube,
     camera,
@@ -36,7 +34,6 @@ export function processFaceLandmarks(results, meshCtx, meshCanvas, systems, face
     const headPose = headPoseDetector.detectPose(landmarks);
     const mouthData = mouthDetector.getMouthData(landmarks);
     const blinkData = blinkDetector.detectBlink(landmarks);
-    const expressionData = smileFrownDetector.detectExpression(landmarks, headPose);
     
     // Calibration phase
     if (!calibration.isCalibrated) {
@@ -53,7 +50,6 @@ export function processFaceLandmarks(results, meshCtx, meshCanvas, systems, face
       if (calibration.isCalibrated) {
         const headPoseBaselines = calibration.getHeadPoseBaselines();
         eyebrowDetector.setBaselines(calibration.eyebrowBaseline, headPoseBaselines);
-        smileFrownDetector.setBaselines(headPoseBaselines);
         updateCalibrationStatus(100, true);
         console.log('All detectors calibrated!');
         console.log('Cube position:', cube.position.x, cube.position.y, cube.position.z);
@@ -93,7 +89,6 @@ export function processFaceLandmarks(results, meshCtx, meshCanvas, systems, face
     blinkEffectManager.onBlinkDetected(blinkData);
     groundColorManager.onBlinkDetected(blinkData);
     eyebrowEffectManager.onEyebrowRaise(eyebrowRaised);
-    smileFrownEffectManager.onExpressionDetected(expressionData);
     
     // Debug logging
     if (blinkData.detected) {
@@ -101,12 +96,6 @@ export function processFaceLandmarks(results, meshCtx, meshCanvas, systems, face
     }
     if (eyebrowRaised) {
       console.log('Eyebrows raised!');
-    }
-    if (expressionData.smile.detected) {
-      console.log('Smile detected! Intensity:', expressionData.smile.intensity.toFixed(2));
-    }
-    if (expressionData.frown.detected) {
-      console.log('Frown detected! Intensity:', expressionData.frown.intensity.toFixed(2));
     }
     
   } catch (error) {

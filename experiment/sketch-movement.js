@@ -19,7 +19,6 @@ import {
   BlinkEffectManager,
   GroundColorManager,
   EyebrowEffectManager,
-  SmileFrownEffectManager,
   MovementController
 } from './dataMapping.js';
 import { processFaceLandmarks } from './faceTrackingCoordinator.js';
@@ -66,7 +65,6 @@ const movementController = new MovementController();
 const blinkEffectManager = new BlinkEffectManager(scene);
 const groundColorManager = new GroundColorManager(ground);
 const eyebrowEffectManager = new EyebrowEffectManager();
-const smileFrownEffectManager = new SmileFrownEffectManager();
 
 const systems = {
   calibration: detectors.calibration,
@@ -74,11 +72,9 @@ const systems = {
   blinkDetector: detectors.blink,
   headPoseDetector: detectors.headPose,
   eyebrowDetector: detectors.eyebrow,
-  smileFrownDetector: detectors.smileFrown,
   blinkEffectManager,
   groundColorManager,
   eyebrowEffectManager,
-  smileFrownEffectManager,
   movementController,
   cube,
   camera,
@@ -146,6 +142,7 @@ function initializeSensitivityControls() {
   const invertCameraToggle = document.getElementById('invert-camera-toggle');
   const cameraRelativeToggle = document.getElementById('camera-relative-toggle');
   const clampCameraToggle = document.getElementById('clamp-camera-toggle');
+  const lookAtCubeToggle = document.getElementById('look-at-cube-toggle');
   const modeSelector = document.getElementById('mode-selector');
   const modeDescription = document.getElementById('mode-description');
   
@@ -157,7 +154,7 @@ function initializeSensitivityControls() {
       
       // Update description
       if (mode === 'head-turn') {
-        modeDescription.textContent = 'Mouse: move cube, Head turn: camera left/right, Head nod: camera up/down';
+        modeDescription.textContent = 'Mouse: move, Head turn: rotate, Head nod: pitch, Head tilt: height';
       } else {
         modeDescription.textContent = 'Head tilt: forward/back, Head roll: left/right';
       }
@@ -231,6 +228,14 @@ function initializeSensitivityControls() {
       console.log(`Clamp camera to ground: ${movementController.clampCameraToGround}`);
     });
     clampCameraToggle.checked = movementController.clampCameraToGround;
+  }
+  
+  if (lookAtCubeToggle) {
+    lookAtCubeToggle.addEventListener('change', (event) => {
+      movementController.lookAtCube = event.target.checked;
+      console.log(`Look at cube: ${movementController.lookAtCube}`);
+    });
+    lookAtCubeToggle.checked = movementController.lookAtCube;
   }
 }
 

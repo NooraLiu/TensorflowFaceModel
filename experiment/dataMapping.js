@@ -15,12 +15,14 @@ export class MovementController {
     this.velocity = { x: 0, z: 0 };
     this.cameraRotationY = 0;
     this.cameraRotationX = 0; // Vertical camera rotation (pitch)
+    this.cameraHeight = 5; // Camera height above ground
     
     // Sensitivity settings
     this.movementSensitivity = 0.8;
     this.rollSensitivity = 0.10;
     this.cameraSensitivity = 2.5;
     this.cameraPitchSensitivity = 3.0; // Sensitivity for up/down camera movement
+    this.cameraHeightSensitivity = 1.0; // Sensitivity for head roll -> camera height
     
     // Movement constants
     this.BASE_MOVEMENT_SPEED = 0.1; // Base speed multiplier
@@ -36,6 +38,7 @@ export class MovementController {
     this.invertCameraControls = true; // Default: inverted
     this.controlMode = 'original'; // 'original' or 'head-turn'
     this.clampCameraToGround = true; // Prevent camera from going below ground level
+    this.lookAtCube = true; // Always look at the cube
     
     // Mouse tracking for head-turn mode
     this.mousePosition = { x: 0, z: 0 };
@@ -154,6 +157,19 @@ export class MovementController {
       this.cameraRotationX = Math.max(minPitch, Math.min(maxPitch, this.cameraRotationX));
     }
     
+    // Use head roll (tilt left/right) to adjust camera height
+    const scaledHeadRoll = headMovement.roll * 20;
+    const filteredHeadRoll = this.applyRollThreshold(scaledHeadRoll);
+    
+    // Adjust camera height with head roll
+    if (Math.abs(filteredHeadRoll) > 0) {
+      const absRoll = Math.abs(filteredHeadRoll);
+      const acceleratedRoll = Math.sign(filteredHeadRoll) * Math.pow(absRoll, 1.2);
+      this.cameraHeight += acceleratedRoll * 0.05 * this.cameraHeightSensitivity;
+      // Clamp camera height to reasonable bounds
+      this.cameraHeight = Math.max(1, Math.min(15, this.cameraHeight));
+    }
+    
     // Apply velocity damping
     this.velocity.x *= 0.9;
     this.velocity.z *= 0.9;
@@ -222,7 +238,6 @@ export class MovementController {
 
   updateCameraFollow(camera, controls) {
     const CAMERA_FOLLOW_SPEED = 0.05;
-    const CAMERA_HEIGHT = 5;
     const CAMERA_DISTANCE = 8;
     
     // Calculate camera position based on both horizontal and vertical rotation
@@ -232,16 +247,27 @@ export class MovementController {
     const targetCameraX = this.position.x + Math.sin(this.cameraRotationY) * rotatedDistance * Math.cos(this.cameraRotationX);
     const targetCameraZ = this.position.z + Math.cos(this.cameraRotationY) * rotatedDistance * Math.cos(this.cameraRotationX);
     
-    // Vertical rotation (X-axis / pitch)
-    const targetCameraY = CAMERA_HEIGHT + Math.sin(this.cameraRotationX) * rotatedDistance;
+    // Vertical rotation (X-axis / pitch) plus dynamic height
+    const targetCameraY = this.cameraHeight + Math.sin(this.cameraRotationX) * rotatedDistance;
     
     camera.position.x += (targetCameraX - camera.position.x) * CAMERA_FOLLOW_SPEED;
     camera.position.y += (targetCameraY - camera.position.y) * CAMERA_FOLLOW_SPEED;
     camera.position.z += (targetCameraZ - camera.position.z) * CAMERA_FOLLOW_SPEED;
     
-    const targetLookX = this.position.x;
-    const targetLookY = 1; // Look at cube center
-    const targetLookZ = this.position.z;
+    // Adjust look-at target based on setting
+    let targetLookX, targetLookY, targetLookZ;
+    
+    if (this.lookAtCube) {
+      // Look at the cube center
+      targetLookX = this.position.x;
+      targetLookY = 1; // Cube center height
+      targetLookZ = this.position.z;
+    } else {
+      // Look based on camera pitch angle to maintain viewing angle
+      targetLookX = this.position.x;
+      targetLookY = this.cameraHeight - Math.cos(this.cameraRotationX) * rotatedDistance * Math.tan(this.cameraRotationX);
+      targetLookZ = this.position.z;
+    }
     
     controls.target.x += (targetLookX - controls.target.x) * CAMERA_FOLLOW_SPEED;
     controls.target.y += (targetLookY - controls.target.y) * CAMERA_FOLLOW_SPEED;
