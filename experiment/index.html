@@ -3,166 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face-Controlled Movement - Experiment</title>
+    <title>Photo Replication Experiment</title>
     <style>
+        :root {
+            --panel-bg: rgba(16, 24, 20, 0.82);
+            --panel-border: rgba(198, 222, 200, 0.22);
+            --text-main: #f1f4ee;
+            --text-dim: #b9c3ba;
+            --accent: #d9f27f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
             overflow: hidden;
-            background-color: #111;
+            font-family: "Segoe UI", sans-serif;
+            background: #101814;
+            color: var(--text-main);
         }
-        
-        #video {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 320px;
-            height: 240px;
-            border: 2px solid #00FF88;
-            border-radius: 8px;
-            z-index: 100;
-            transform: scaleX(-1); /* Mirror the video */
+
+        canvas {
+            display: block;
         }
-        
-        #mesh-canvas {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 320px;
-            height: 240px;
-            border: 2px solid #00FFFF;
-            border-radius: 8px;
-            z-index: 101; /* Higher z-index to appear on top of video */
-            background: transparent; /* Transparent background to see video underneath */
-            pointer-events: none; /* Allow clicks to pass through to video */
-            transform: scaleX(-1); /* Mirror the canvas to match the video */
+
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
         }
-        
-        #error {
-            position: absolute;
+
+        .eyebrow {
+            color: var(--accent);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .title {
+            margin: 4px 0 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .subtle {
+            margin: 8px 0 0;
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        #instruction-panel {
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #ff4444;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 20px;
-            border-radius: 8px;
-            font-size: 18px;
-            z-index: 200;
-            display: none;
+            width: min(760px, calc(100vw - 40px));
+            z-index: 30;
             text-align: center;
-            max-width: 400px;
+            pointer-events: none;
         }
-        
+
+        #instruction-body {
+            margin-top: 10px;
+            font-size: 17px;
+            color: var(--text-main);
+            line-height: 1.55;
+            white-space: pre-wrap;
+        }
+
+        #center-status {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--accent);
+            min-height: 20px;
+        }
+
+        #bottom-actions {
+            position: fixed;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 35;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: min(900px, calc(100vw - 24px));
+        }
+
+        button,
+        select {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-main);
+            padding: 10px 14px;
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            background: linear-gradient(135deg, #566e4d, #29362a);
+            min-width: 150px;
+        }
+
+        button:hover {
+            border-color: rgba(217, 242, 127, 0.45);
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: default;
+        }
+
+        #reference-panel {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            width: min(360px, calc(100vw - 28px));
+            z-index: 20;
+        }
+
+        #reference-canvas {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            border-radius: 12px;
+            margin-top: 12px;
+            background: #d9e1d7;
+        }
+
+        #metrics-grid {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 8px;
+        }
+
+        .metric-label {
+            color: var(--text-dim);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .metric-value {
+            margin-top: 4px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        #tracking-shell {
+            position: fixed;
+            right: 14px;
+            bottom: 14px;
+            width: 320px;
+            z-index: 20;
+            display: grid;
+            gap: 8px;
+        }
+
+        #recalibrate-button {
+            width: 100%;
+            min-width: 0;
+        }
+
+        #tracking-panel {
+            width: 100%;
+        }
+
+        #video-shell {
+            position: relative;
+            margin-top: 12px;
+            aspect-ratio: 4 / 3;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        #video,
+        #mesh-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(-1);
+        }
+
+        #mesh-canvas {
+            pointer-events: none;
+        }
+
         #status {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #00FF88;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 16px;
-            z-index: 100;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--accent);
+            min-height: 18px;
         }
-        
-        #nav-button {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            padding: 12px 20px;
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+        #error {
+            position: fixed;
+            left: 50%;
+            top: 16px;
+            transform: translateX(-50%);
+            background: rgba(66, 9, 9, 0.92);
+            color: #ffd8d8;
+            border: 1px solid rgba(255, 129, 129, 0.45);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: none;
+            z-index: 50;
+            max-width: min(680px, calc(100vw - 32px));
         }
-        
-        #nav-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+
+        #countdown-overlay {
+            position: fixed;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 180px;
+            text-align: center;
+            background: rgba(10, 20, 16, 0.8);
+            border: 1px solid rgba(217, 242, 127, 0.35);
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 44px;
+            font-weight: 700;
+            color: #eaf6bc;
+            z-index: 45;
+            display: none;
         }
-        
-        #nav-button:active {
-            transform: translateY(0);
+
+        #timer-readout {
+            position: fixed;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 140px;
+            text-align: center;
+            background: rgba(10, 20, 16, 0.78);
+            border: 1px solid rgba(104, 211, 255, 0.34);
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #d6efff;
+            z-index: 44;
         }
-        
-        #pacman-button {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #ffff00 0%, #ffaa00 100%);
-            color: #000;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+        #hidden-config {
+            position: fixed;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
         }
-        
-        #pacman-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-        
-        #pacman-button:active {
-            transform: translateY(0);
-        }
-        
-        /* Pink slider styling */
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            height: 8px;
-            border-radius: 5px;
-            background: #ddd;
-            outline: none;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ff69b4;
-            cursor: pointer;
-            border: 2px solid #ff1493;
-        }
-        
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ff69b4;
-            cursor: pointer;
-            border: 2px solid #ff1493;
-        }
-        
-        input[type="range"]::-webkit-slider-track {
-            background: linear-gradient(to right, #ffb6c1, #ff69b4);
-            height: 8px;
-            border-radius: 5px;
-        }
-        
-        input[type="range"]::-moz-range-track {
-            background: linear-gradient(to right, #ffb6c1, #ff69b4);
-            height: 8px;
-            border-radius: 5px;
+
+        @media (max-width: 1000px) {
+            #tracking-shell {
+                display: none;
+            }
+
+            #instruction-panel {
+                width: calc(100vw - 24px);
+            }
+
+            #reference-panel {
+                width: calc(100vw - 24px);
+                right: 12px;
+                top: auto;
+                bottom: 84px;
+            }
         }
     </style>
-    
-    <!-- Import map for ES6 modules -->
+
     <script type="importmap">
     {
         "imports": {
@@ -173,107 +301,75 @@
     </script>
 </head>
 <body>
-    <div id="status">Face tracking initialized - Step 1 complete!</div>
-    
-    <!-- Sensitivity Control UI -->
-    <div id="sensitivity-control" style="position: absolute; top: 70px; left: 10px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; color: white; font-family: Arial, sans-serif; min-width: 200px; z-index: 100;">
-        <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #444;">
-            <div style="font-weight: bold; color: #00FF88; margin-bottom: 8px;">Control Mode</div>
-            <select id="mode-selector" style="width: 100%; padding: 5px; border-radius: 4px; background: #222; color: white; border: 1px solid #00FF88;">
-                <option value="original">Original (Head Tilt/Roll)</option>
-                <option value="head-turn">Head Turn + Mouse</option>
-            </select>
-            <div id="mode-description" style="margin-top: 5px; font-size: 10px; color: #999;">
-                Head tilt: forward/back, Head roll: left/right
-            </div>
-        </div>
-        <div style="margin-bottom: 8px; font-weight: bold; color: #00FF88;">Forward/Back Sensitivity</div>
-        <input type="range" id="sensitivity-slider" min="0.1" max="1.0" step="0.1" value="0.3" style="width: 100%; margin-bottom: 5px;">
-        <div style="text-align: center; font-size: 14px; color: #00FFFF;">
-            <span id="sensitivity-value">0.3x</span>
-        </div>
-        
-        <div style="margin-top: 15px; margin-bottom: 8px; font-weight: bold; color: #00FF88;">Left/Right Sensitivity</div>
-        <input type="range" id="roll-sensitivity-slider" min="0.05" max="0.15" step="0.01" value="0.10" style="width: 100%; margin-bottom: 5px;">
-        <div style="text-align: center; font-size: 14px; color: #00FFFF;">
-            <span id="roll-sensitivity-value">0.10x</span>
-        </div>
-        
-        <div style="margin-top: 15px; margin-bottom: 8px; font-weight: bold; color: #00FF88;">Camera Turn Sensitivity</div>
-        <input type="range" id="camera-sensitivity-slider" min="0" max="3.0" step="0.1" value="2.0" style="width: 100%; margin-bottom: 5px;">
-        <div style="text-align: center; font-size: 14px; color: #00FFFF;">
-            <span id="camera-sensitivity-value">2.0x</span>
-        </div>
-        
-        <div style="margin-top: 8px; font-size: 11px; color: #ccc;">
-            Adjust how responsive the cube movement is to your head tilting
-        </div>
-        
-        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #444;">
-            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #00FF88;">
-                <input type="checkbox" id="invert-camera-toggle" checked style="margin-right: 8px; transform: scale(1.2);">
-                Invert Camera Controls
-            </label>
-            <div style="margin-top: 5px; font-size: 10px; color: #999;">
-                Turn head left → camera goes right
-            </div>
-            
-            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #00FF88; margin-top: 10px;">
-                <input type="checkbox" id="camera-relative-toggle" checked style="margin-right: 8px; transform: scale(1.2);">
-                Camera-Relative Movement
-            </label>
-            <div style="margin-top: 5px; font-size: 10px; color: #999;">
-                Move relative to camera direction vs world coordinates
-            </div>
-            
-            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #00FF88; margin-top: 10px;">
-                <input type="checkbox" id="clamp-camera-toggle" checked style="margin-right: 8px; transform: scale(1.2);">
-                Clamp Camera to Ground
-            </label>
-            <div style="margin-top: 5px; font-size: 10px; color: #999;">
-                Prevent camera from looking below ground level
-            </div>
-            
-            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #00FF88; margin-top: 10px;">
-                <input type="checkbox" id="look-at-cube-toggle" checked style="margin-right: 8px; transform: scale(1.2);">
-                Always Look at Cube
-            </label>
-            <div style="margin-top: 5px; font-size: 10px; color: #999;">
-                Camera always focuses on cube vs free look
-            </div>
-        </div>
+    <div id="hidden-config">
+        <select id="condition-select">
+            <option value="mouse-only">Mouse-only</option>
+            <option value="head-mouse">Head + Mouse</option>
+        </select>
+
+        <select id="scene-select">
+            <option value="clean">Clean Scene</option>
+            <option value="clustered">Clustered Scene</option>
+        </select>
     </div>
-    
-    <video id="video" autoplay muted playsinline></video>
-    <canvas id="mesh-canvas" width="320" height="240"></canvas>
-    
+
+    <section id="instruction-panel" class="panel">
+        <p class="eyebrow" id="instruction-stage">Guided Practice</p>
+        <h1 class="title" id="instruction-title">Mouse Practice</h1>
+        <div id="instruction-body">Read instructions and click I Understand to begin.</div>
+        <div id="center-status"></div>
+    </section>
+
+    <div id="bottom-actions">
+        <button id="stage-button" type="button">I Understand</button>
+        <button id="retry-practice-button" type="button">Retry</button>
+        <button id="proceed-button" type="button">Continue</button>
+        <button id="reset-camera-button" type="button">Reset Camera Orbit</button>
+    </div>
+
+    <aside id="reference-panel" class="panel">
+        <p class="eyebrow">Reference Panel</p>
+        <h2 class="title" style="font-size: 18px; margin-top: 2px;">Target Reference Photo</h2>
+        <p class="subtle">Match this image by adjusting camera and cube position, then press SPACE to submit.</p>
+        <canvas id="reference-canvas" width="640" height="400"></canvas>
+    </aside>
+
+    <div id="timer-readout">90.0s</div>
+
+    <div id="hidden-readouts" style="display:none;">
+        <span id="condition-readout"></span>
+        <span id="scene-readout"></span>
+        <span id="azimuth-readout"></span>
+        <span id="elevation-readout"></span>
+        <span id="phase-readout"></span>
+        <span id="trial-readout"></span>
+        <span id="position-error-readout"></span>
+        <span id="camera-error-readout"></span>
+    </div>
+
+    <section id="tracking-shell">
+        <button id="recalibrate-button" type="button">Recalibrate</button>
+
+        <aside id="tracking-panel" class="panel">
+            <p class="eyebrow">Tracking</p>
+            <h2 class="title" style="font-size: 18px;">Head Input</h2>
+            <p class="subtle">Use this panel to verify face tracking and calibration state.</p>
+            <div id="status">Ready.</div>
+            <div id="video-shell">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="mesh-canvas" width="320" height="240"></canvas>
+            </div>
+        </aside>
+    </section>
+
     <div id="error"></div>
-    
-    <button id="nav-button" onclick="goToRotationControl()">
-        Back to Rotation Control
-    </button>
-    
-    <button id="pacman-button" onclick="goToPacman()">
-        Play Pac-Man 🎮
-    </button>
-    
-    <!-- MediaPipe scripts -->
+    <div id="countdown-overlay">3</div>
+
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
-    
-    <!-- Main application script -->
+
     <script type="module" src="./sketch-movement.js"></script>
-    
-    <script>
-        function goToRotationControl() {
-            window.location.href = '../example_rotation/index.html';
-        }
-        
-        function goToPacman() {
-            window.location.href = '../example_pacman/index.html';
-        }
-    </script>
 </body>
 </html>
