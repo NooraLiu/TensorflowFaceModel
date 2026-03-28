@@ -343,6 +343,80 @@
             opacity: 1;
         }
 
+        #task-intro-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(10, 18, 14, 0.97);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #task-intro-overlay .intro-card {
+            width: min(680px, calc(100vw - 40px));
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 32px 36px;
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.4);
+            text-align: left;
+        }
+
+        #task-intro-overlay .intro-eyebrow {
+            color: var(--accent);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin: 0 0 8px;
+        }
+
+        #task-intro-overlay h2 {
+            margin: 0 0 16px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        #task-intro-overlay p {
+            color: var(--text-dim);
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 0 0 12px;
+        }
+
+        #task-intro-overlay ul {
+            color: var(--text-dim);
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 0 0 20px;
+            padding-left: 20px;
+        }
+
+        #task-intro-overlay ul li {
+            margin-bottom: 6px;
+        }
+
+        #task-intro-overlay .speed-accuracy {
+            background: rgba(217, 242, 127, 0.08);
+            border: 1px solid rgba(217, 242, 127, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 15px;
+            color: var(--accent);
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        #task-intro-start-btn {
+            width: 100%;
+            padding: 13px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
         @media (max-width: 1000px) {
             #tracking-shell {
                 display: none;
@@ -375,6 +449,40 @@
     </script>
 </head>
 <body>
+    <div id="task-intro-overlay">
+        <div class="intro-card">
+            <p class="intro-eyebrow">Before You Begin</p>
+            <h2>Your Task</h2>
+            <p>
+                In each trial you will see two <strong>reference photos</strong> showing a 3D structure built from five coloured blocks.
+                Your goal is to <strong>recreate that structure</strong> by repositioning the blocks in the 3D scene to match the reference as closely as possible.
+            </p>
+            <ul>
+                <li>You will complete trials using <strong>mouse-only</strong> camera control and <strong>head&nbsp;+&nbsp;mouse</strong> camera control.</li>
+                <li>Each block has a fixed height — only its position on the ground plane can be changed.</li>
+                <li>Two reference views (front and side) are always visible on the right-hand panel.</li>
+                <li>The trial ends <strong>automatically</strong> once all five blocks are in the correct location, or when the <strong>90-second</strong> countdown expires.</li>
+                <li>If the reference photos do not fully reveal the layout, <strong>make your best guess and try</strong> — at most one block's position will require this, and the trial ends automatically as soon as all placements are correct.</li>
+            </ul>
+            <div class="speed-accuracy">Work as quickly and accurately as possible on every trial.</div>
+            <button id="task-intro-start-btn" type="button">I Understand — Start the Experiment</button>
+        </div>
+    </div>
+
+    <script>
+      (function () {
+        const overlay = document.getElementById('task-intro-overlay');
+        if (sessionStorage.getItem('taskIntroSeen') === 'true') {
+          overlay.style.display = 'none';
+        } else {
+          document.getElementById('task-intro-start-btn').addEventListener('click', function () {
+            sessionStorage.setItem('taskIntroSeen', 'true');
+            overlay.style.display = 'none';
+          });
+        }
+      })();
+    </script>
+
     <div id="hidden-config">
         <select id="condition-select">
             <option value="mouse-only">Mouse-only</option>
@@ -423,7 +531,7 @@
     <aside id="reference-panel" class="panel">
         <p class="eyebrow">Reference Panel</p>
         <h2 class="title" style="font-size: 18px; margin-top: 2px;">Target Reference Photos</h2>
-        <p class="subtle">Use the front and side views to rebuild the structure, then press SPACE to submit.</p>
+        <p class="subtle">Use the front and side views to rebuild the structure. The trial ends automatically when all blocks are correctly placed or the timer runs out.</p>
         <div id="reference-canvases">
             <canvas id="reference-canvas" width="640" height="400"></canvas>
             <canvas id="reference-canvas-secondary" width="640" height="400"></canvas>
