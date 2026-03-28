@@ -9,8 +9,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 export const CAMERA_CONSTRAINTS = {
   target: new THREE.Vector3(0, 0.5, 0),
   distance: 20,
-  azimuthMinDeg: -180,
-  azimuthMaxDeg: 180,
+  azimuthMinDeg: -90,
+  azimuthMaxDeg: 90,
   elevationMinDeg: 0,
   elevationMaxDeg: 90,
   initialAzimuthDeg: 18,
@@ -65,8 +65,8 @@ export function setupControls(camera, renderer) {
   controls.target.copy(CAMERA_CONSTRAINTS.target);
   controls.minDistance = CAMERA_CONSTRAINTS.distance;
   controls.maxDistance = CAMERA_CONSTRAINTS.distance;
-  controls.minAzimuthAngle = -Infinity;
-  controls.maxAzimuthAngle = Infinity;
+  controls.minAzimuthAngle = THREE.MathUtils.degToRad(CAMERA_CONSTRAINTS.azimuthMinDeg);
+  controls.maxAzimuthAngle = THREE.MathUtils.degToRad(CAMERA_CONSTRAINTS.azimuthMaxDeg);
   controls.minPolarAngle = THREE.MathUtils.degToRad(90 - CAMERA_CONSTRAINTS.elevationMaxDeg);
   controls.maxPolarAngle = THREE.MathUtils.degToRad(90 - CAMERA_CONSTRAINTS.elevationMinDeg);
   controls.update();

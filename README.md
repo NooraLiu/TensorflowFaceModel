@@ -1,6 +1,6 @@
-Research Proposal: Multimodal Head-Movement and Mouse-Based Camera Control for 3D Scene Arrangement
+Research Proposal: Multimodal Head-Movement and Mouse-Based Camera Control for 3D Structure Reconstruction
 1. Elevator Pitch
-What? I want to study the effectiveness and learnability of a multimodal interaction system that combines real-time head movements for camera navigation with traditional mouse input for 3D object manipulation, through a photo replication task where participants match a reference image by adjusting both the camera viewpoint and the object's position in a 3D scene.
+What? I want to study the effectiveness and learnability of a multimodal interaction system that combines real-time head movements for camera navigation with traditional mouse input for 3D object manipulation, through a structure reconstruction task where participants recreate a multi-block 3D arrangement shown in two reference photos by placing colored blocks at the correct positions in the scene.
 Why? Because 3D designers often experience frustration when trying to find optimal viewing angles while simultaneously arranging objects, and I want to determine if head-based camera control is more intuitive and efficient than the traditional modal mouse setup.
 So What? This study aims to optimize the 3D working pipeline for designers, improve ergonomic health by reducing strain from repetitive mouse movements, and provide new avenues for assistive technology and creative gaming.
 2. Introduction and Motivation
@@ -10,10 +10,10 @@ Beyond professional design efficiency, this research is motivated by accessibili
 Furthermore, Hashemian et al. (2020) introduced the "HeadJoystick," an interface where the user’s head acts as a controller handle to guide virtual movement . Their findings suggest that leaning-based or head-based interfaces can significantly reduce cognitive load and mitigate visually induced motion sickness (VIMS) compared to standard handheld controllers because they provide vestibular cues that are better aligned with visual motion. Since HeadJoystick demonstrated reduced VIMS in VR, it is worth testing whether similar embodied benefits transfer to desktop 3D environments. By applying these "embodied" interaction principles to the specific professional task of 3D scene arrangement, this research seeks to determine if "leaning into" a scene via head-based camera control can outperform traditional mode-based mouse interaction modifiers in both designer performance and subjective comfort.
 Finally, the democratization of browser-based computer vision through frameworks like MediaPipe enables real-time, high-fidelity tracking (30–60 FPS) using only a standard webcam, removing the need for expensive, specialized hardware. This study seeks to leverage these technical advancements to determine if a hybrid paradigm—using the head for viewpoint control and the mouse for manipulation—can outperform the traditional mode-based mouse interaction setup in both efficiency and ease of learning.
 3. Research Questions
-RQ1: Does using head movement for camera control lead to significant differences in task efficiency (completion time) and accuracy (object position error, camera pose error) compared to traditional mode-based mouse camera control during 3D photo replication tasks?
+RQ1: Does using head movement for camera control lead to significant differences in task efficiency (completion time) and accuracy (structure reconstruction error) compared to traditional mode-based mouse camera control during 3D structure reconstruction tasks?
 RQ2: Does head-based camera control lead to faster learning and greater perceived ease of use for novice users compared to traditional mode-based mouse camera control in 3D environments?
 4. Hypotheses
-H1 (Main Effect of Control Method): Participants will complete 3D photo replication tasks faster and more accurately when using head movement for camera control compared to mode-based mouse camera control, because head-based camera adjustment allows the viewpoint to be tuned simultaneously with mouse-based object placement, reducing the need for mode switching.
+H1 (Main Effect of Control Method): Participants will complete 3D structure reconstruction tasks faster and more accurately when using head movement for camera control compared to mode-based mouse camera control, because head-based camera adjustment allows the viewpoint to be freely inspected simultaneously with mouse-based block placement, reducing the need for mode switching.
 H2 (Interaction Effect - Learnability): Novice users will show a greater performance improvement with head-based camera control compared to experienced users, as indicated by a significant Control Method × Experience Level interaction. Specifically, the performance gap between novices and experienced users will be smaller in the Head+Mouse condition than in the Mode-Based Mouse condition.
 H3 (Learning Curve): Participants will exhibit a steeper learning curve (faster improvement across trials) when using head-based camera control compared to mode-based mouse camera control, as indicated by a significant Control Method × Trial Number interaction in the mixed-effects model.
 H4 (Perceived Workload): Participants will report lower perceived workload (NASA-TLX) and higher ease of use ratings when using head-based camera control compared to mode-based mouse camera control.
@@ -31,67 +31,67 @@ We will recruit 16 participants from the university population, divided into two
 This grouping will allow us to analyze how expertise influences the adoption of head-based control.
 Sample Size Justification: Based on prior HCI studies comparing input modalities (e.g., Hashemian et al., 2020; Liu et al., 2024), we expect a large effect size (Cohen's d ≈ 0.8–1.0) for the main effect of control method. A power analysis using G*Power for a within-subjects ANOVA with α = .05, power = .80, and d = 0.8 indicates a minimum of 15 participants. With 16 participants (8 per group), we have adequate power for detecting the primary within-subjects effect, though power for the between-subjects interaction may be limited. This is acknowledged as a limitation.
 6.2 Stimuli/Apparatus
-The experimental setup will include a standard PC running a custom 3D environment.
+The experimental setup will include a standard PC running a custom browser-based 3D environment.
+
 Both conditions share the following fixed camera constraints to ensure fairness:
 - Camera distance is fixed (zoom disabled). Scroll-wheel input is ignored in both conditions.
 - Pan is disabled in both conditions. The camera look-at target is fixed at the scene center for the entire trial.
-- Camera orbit is constrained to the same angular bounds in both conditions: azimuth full 360° (unrestricted yaw), elevation 0°–90°.
-- Object movement uses identical raycasting drag in both conditions: left mouse drag translates the cube along the Y=0 ground plane.
+- Camera orbit is constrained to the same angular bounds in both conditions: azimuth ±180° (full yaw), elevation 0°–90°.
+- Block movement uses identical raycasting drag in both conditions: left mouse drag translates a block along the Y=0 ground plane.
 
-Control Condition (Mouse-only): Right mouse drag → orbit camera (within the shared angular bounds above); Left mouse drag → move object along the ground plane.
-Experimental Condition (Head+Mouse): Head yaw → orbit camera horizontally (full 360° yaw); Head pitch → orbit camera vertically (within 0°–90°); Left mouse drag → move object along the ground plane (identical to control condition).
-Software: The system will use the Face Mesh model to calculate Euler angles (yaw, pitch, roll) from facial landmarks.
-Reference Stimuli: Each trial displays a reference photo pre-rendered from a randomly sampled ground-truth configuration. Camera azimuth and elevation are sampled uniformly within the shared navigation bounds (azimuth: full 360° yaw, elevation: 0°–90°); camera distance is fixed at the same value used during the live trial. The object is placed at a random position on the ground plane within the scene bounds. All ground-truth parameters (camera azimuth, camera elevation, object position) are stored in client-side session state to enable error calculation at submission time. Reference photos are generated once per session and reused across both control conditions to ensure identical difficulty.
+Control Condition (Mouse-only): Right mouse drag → orbit camera (within the shared angular bounds above); Left mouse drag → move selected block along the ground plane.
+Experimental Condition (Head+Mouse): Head yaw → orbit camera horizontally; Head pitch → orbit camera vertically (within shared bounds); Left mouse drag → move selected block along the ground plane (identical to control condition). Clicking a block selects it for movement.
+Software: The system uses the MediaPipe Face Mesh model to calculate Euler angles (yaw, pitch, roll) from facial landmarks streamed in real time at 30–60 FPS via standard webcam.
+
+Reference Stimuli: Each trial presents two reference photos of the target structure — a fixed front view (azimuth 0°, elevation 24°) and a side view (azimuth ±90°, randomly assigned left or right per trial, elevation 24°). The structure consists of five colored blocks with individually fixed heights (0.6, 0.8, 1.1, 1.45, and 1.9 units) placed on a 1.1-unit grid. Block color and height assignments are randomized independently for each trial, as is the specific layout template and its rotation. The front reference is generated subject to a constraint that at least one block must be completely occluded (fully hidden behind a taller block) from the front viewpoint, ensuring the side view provides necessary additional spatial information. The scene is always uncluttered to isolate structure reconstruction difficulty from visual search demands. All ground-truth block positions are stored in session state to compute reconstruction error at submission time.
 6.3 Experimental Design
 The study will use a 2 × 2 mixed-design factorial experiment:
 Independent Variables (IVs):
 - Control Method (within-subjects): Head-Movement + Mouse vs. Mode-Based Mouse Interaction.
 - Experience Level (between-subjects): Novice (<10 hours in 3D software) vs. Experienced (>50 hours).
 Dependent Variables (DVs):
-- Task Completion Time (seconds): Measured from trial start to SPACEBAR confirmation.
-- Object Position Error (cm): Euclidean distance between the submitted object position and the ground-truth object position from the reference configuration, calculated as √((x₁−x₂)² + (y₁−y₂)² + (z₁−z₂)²) in world units (1 unit = 1 cm).
-- Camera Pose Error (degrees): Angular difference between the submitted camera orientation and the ground-truth camera orientation used to generate the reference photo, calculated using quaternion distance: θ = 2 × arccos(|q₁ · q₂|), converted to degrees.
+- Task Completion Time (seconds): Measured from trial start to submission for completed trials. Timed-out trials are assigned the maximum of 90 seconds.
+- Trial Completion Rate: Proportion of trials in which the participant successfully placed all five blocks within the time limit. Since blocks snap to a fixed grid, placement is binary — a block is either on its correct cell or not. Completion rate therefore captures accuracy for trials where the time limit was a binding constraint.
+- Blocks Correctly Placed at Timeout (Secondary): For timed-out trials only, the number of blocks (0–5) on their correct grid cell at the moment of timeout. This provides a finer accuracy signal for incomplete trials.
+- Number of Block Repositions: Total number of times each block was moved (picked up and re-placed) before final submission, summed across all five blocks. Higher repositions may indicate spatial uncertainty about the structure; head-based camera control is hypothesized to reduce this by making multi-angle inspection easier.
 - Perceived Workload (Interval): Measured using the NASA-TLX questionnaire across six dimensions: mental, physical, temporal, performance, effort, and frustration.
 Experimental Structure:
 - Trials per Condition: 12 trials per control method (24 total trials per participant).
-- Scene Types: 6 trials in empty scenes, 6 trials in cluttered scenes per condition (balanced but not analyzed as a primary IV).
-- Trial Duration: Maximum 90 seconds per trial; trials exceeding this limit are marked as incomplete. For completion time analysis, timed-out trials are assigned 90 seconds. For accuracy analysis (object position error, camera pose error), timed-out trials use the participant's object and camera state at the moment of timeout.
+- Trial Duration: Maximum 90 seconds per trial; trials completing the full structure before the timer automatically submit. Timed-out trials are marked as incomplete. For completion time analysis, timed-out trials are assigned 90 seconds. For accuracy analysis, timed-out trials use the participant's block placement state at the moment of timeout.
 - Session Duration: Approximately 45–50 minutes total (including calibration, training, tasks, breaks, and questionnaires).
 - Breaks: 2-minute mandatory break between conditions; optional 30-second breaks every 4 trials.
 Counterbalancing and Randomization:
 - Condition order will be counterbalanced: half of participants in each experience group will complete Head+Mouse first, while the other half will complete Mode-Based Mouse first (AB/BA design).
-- Within each condition, trial order (scene type and object type) will be randomized for each participant.
-- Reference photos are generated from randomly sampled configurations within the valid scene bounds (see Section 6.2). A single set of 12 reference configurations is generated per scene type (12 clean, 12 cluttered); the same reference photos are presented in both control conditions to ensure comparable difficulty.
-Scene Complexity (Controlled Variable):
-Scene complexity (empty vs. cluttered) is balanced across trials to ensure ecological validity but is treated as a controlled variable rather than a primary independent variable. An exploratory secondary analysis may examine whether scene complexity moderates the effect of control method.
+- Within each condition, trial order will be randomized for each participant.
+- Reference structure configurations (template shape, rotation, block height and color assignments, side-view direction) are independently randomized per trial for each participant. The same configuration is presented in both control conditions for a given trial index to ensure comparable difficulty.
 Outlier and Data Exclusion Criteria:
 - In the Head+Mouse condition, trials with tracking loss exceeding 3 consecutive seconds will be flagged and excluded from accuracy analyses (but included in completion time analyses as failures).
 - Completion times beyond 3 standard deviations from the participant's mean will be winsorized to the 3 SD boundary.
 - Participants with >25% excluded trials in any condition will be replaced.
 6.4 Procedure
 1. Introduction (5 min): Participants receive an overview of the study and sign the informed consent form.
-2. Pre-Study Questionnaire (3 min): 3D software experience (hours)
-3. Calibration (<1 min): A 30-frame (~1 second) calibration period to establish a personalized "neutral" head baseline. Participants are instructed to look directly at the center of the screen in a comfortable posture.
-4. Training Phase (4 min per condition, 8 min total):
-- 2 practice trials per control method with on-screen guidance.
-- Participants must successfully complete both practice trials before proceeding.
+2. Pre-Study Questionnaire (3 min): 3D software experience (hours).
+3. Calibration — Phase 1 (<1 min): A ~30-frame (~1 second) calibration period to establish a personalized "neutral" head baseline. Participants are instructed to look directly at the center of the screen in a comfortable, natural posture and remain still.
+4. Calibration — Phase 2: Head Movement Range (<2 min): Participants move their head comfortably left/right and up/down to define their personal movement range. When the range feels comfortable and representative, they click "Lock Range." A 82% buffer is applied to the peak observed values so that users can reach the full camera orbit range without reproducing their absolute peak movement on every trial.
+5. Training Phase (4 min per condition, 8 min total):
+- 2 practice trials per control method with on-screen guidance and reference photos shown throughout.
 - Training order matches experimental condition order.
-5. Experimental Trials (5–10 min per condition, ~15–20 min total):
-Task Instructions (read to participants): "You will see a reference photo of a 3D scene shown at the top of the screen. Your goal is to replicate that photo as closely as possible by moving the object using the mouse and adjusting the camera angle using your input method. When you are satisfied with your match, press the SPACEBAR to capture your view and submit. You have up to 90 seconds per trial. Work as quickly and accurately as you can."
-- 12 trials per condition (6 empty scenes, 6 cluttered scenes, randomized).
+6. Experimental Trials (5–10 min per condition, ~15–20 min total):
+Task Instructions (read to participants): "You will see two reference photos of a 3D block structure — a front view and a side view. Your goal is to recreate that structure as accurately as possible by arranging the five colored blocks using the mouse. You can change your viewing angle to inspect the scene. When you are satisfied with your arrangement, press SPACE to submit. You have up to 90 seconds per trial. Work as quickly and accurately as you can."
+- 12 trials per condition, randomized.
 - 2-minute mandatory break between conditions.
-6. Post-Condition Questionnaires (5 min per condition):
+7. Post-Condition Questionnaires (5 min per condition):
 - NASA-TLX (workload)
 - Custom usability questionnaire (7-point Likert scale) on comfort, intuitiveness, and preference.
-7. Debrief (5 min): Semi-structured interview about preferences, difficulties, and suggestions.
+8. Debrief (5 min): Semi-structured interview about preferences, difficulties, and suggestions.
 6.5 Data Analysis
 Normality and Transformation:
 We will use the Shapiro-Wilk test to assess data normality for each DV. If normality is violated, we will apply an Aligned Rank Transform (ART) before conducting parametric analyses (Wobbrock et al., 2011).
 Primary Analysis (H1 - Efficiency and Accuracy):
-A 2 × 2 mixed-design ANOVA will be conducted for each DV (task completion time, object position error, camera pose error) with:
+A 2 × 2 mixed-design ANOVA will be conducted for each DV (task completion time, trial completion rate, number of block repositions) with:
 - Control Method (within-subjects): Head+Mouse vs. Mode-Based Mouse
 - Experience Level (between-subjects): Novice vs. Experienced
-We will examine main effects of each factor and the Control Method × Experience Level interaction. Post-hoc pairwise comparisons will use Bonferroni correction (α = .05).
+Trial completion rate (a proportion) will be analyzed using a generalized linear mixed model (GLMM) with a binomial link if the distribution is heavily skewed. We will examine main effects of each factor and the Control Method × Experience Level interaction. Post-hoc pairwise comparisons will use Bonferroni correction (α = .05).
 Interaction Analysis (H2 - Experience × Control Method):
 The Control Method × Experience Level interaction from the 2 × 2 mixed-design ANOVA will test H2. A significant interaction, followed by simple effects analysis, will reveal whether novices benefit disproportionately from head-based control compared to experienced users.
 Learning Curve Analysis (H3):
@@ -112,7 +112,7 @@ We will report partial η² for ANOVA effects and Cohen's d for pairwise compari
 6.6 Critical Reflection
 A strength of this approach is the use of MediaPipe, which provides robust, real-time tracking (30–60 FPS) without specialized hardware. However, a potential weakness is "occlusion handling"—tracking may fail if the user turns their head more than 60 degrees. Additionally, "head jitter" could impact precision compared to the stable spatial reference of a desk when using a mouse.
 7. Feasibility
-The project is highly feasible within the semester timeline. A working prototype of the Unity/MediaPipe interface has already been developed for the project pitch. Access to webcams and standard computing labs is readily available.
+The project is highly feasible within the semester timeline. A working browser-based prototype of the structure reconstruction experiment has been developed, featuring real-time MediaPipe face tracking, dual reference photo rendering with guaranteed occlusion, a two-phase head calibration flow, and automated structure-match detection. Access to webcams and standard computing labs is readily available.
 8. Ethical Concerns
 Prior to the experiment, participants will receive an informed consent form describing the study’s purpose (evaluating different camera control techniques in a 3D environment), the tasks they will perform, and the approximate duration of the session. Participants will be informed that the study will collect performance data such as task completion time, placement accuracy, and responses to usability questionnaires.
 Participation will be voluntary, and participants may withdraw at any time without penalty. No personally identifiable information will be stored with the collected data, and all results will be reported in aggregate form. Participants will provide written or digital consent before the experiment begins.
@@ -122,10 +122,10 @@ I am personally interested in this topic because I find the traditional 3D desig
 10. Limitations
 This study has several limitations that should be acknowledged:
 - Statistical Power: With 16 participants (8 per group), we have adequate power for the primary within-subjects effect (Control Method), but limited power to detect the between-subjects interaction (Control Method × Experience Level). Null results for H2 should be interpreted cautiously.
-- Generalizability: Participants are university students, which may not fully represent professional 3D designers. Additionally, the controlled laboratory task (photo replication with a bounded ground plane and fixed camera distance) simplifies real-world 3D design workflows.
+- Generalizability: Participants are university students, which may not fully represent professional 3D designers. Additionally, the controlled laboratory task (structure reconstruction with fixed block heights and a bounded ground plane) simplifies real-world 3D design workflows.
 - Head Tracking Constraints: MediaPipe face tracking may fail with extreme head rotations (>60°), occlusion (e.g., hands covering face), or poor lighting conditions, potentially introducing exclusions specific to the Head+Mouse condition.
 - Learning Effects: Despite counterbalancing, skills learned in the first condition may partially transfer to the second, potentially attenuating differences between conditions.
-- Ecological Validity: The 90-second trial limit and discrete placement tasks differ from the continuous, open-ended nature of professional 3D work.
+- Ecological Validity: The 90-second trial limit and discrete block placement tasks differ from the continuous, open-ended nature of professional 3D work.
 11. References
 Abbaszadegan, M., Yaghoubi, S., & MacKenzie, I. S. (2018). TrackMaze: A comparison of head-tracking, eye-tracking, and tilt as input methods for mobile games. In M. Kurosu (Ed.), Human-Computer Interaction (HCI 2018) (pp. 393–405). Springer.
 Bazarevsky, V., Kartynnik, Y., Vakunov, A., Raveendran, K., & Grundmann, M. (2019). BlazeFace: Sub-millisecond neural face detection on mobile GPUs. arXiv preprint arXiv:1907.05047.

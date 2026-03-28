@@ -86,14 +86,23 @@ export function createClutterGroup(scene) {
   clutterGroup.name = 'clutter-group';
 
   const clutterSpecs = [
-    { type: 'cylinder', color: 0x6a8f64, position: [-2.2, 1.2, -1.8], scale: [0.65, 2.4, 0.65] },
-    { type: 'box', color: 0xb68b67, position: [2.0, 0.65, -2.1], scale: [1.6, 1.3, 1.2] },
-    { type: 'cylinder', color: 0x5c7b55, position: [2.4, 1.5, 1.8], scale: [0.7, 3.0, 0.7] },
-    { type: 'box', color: 0xc6b29a, position: [-1.8, 0.45, 2.4], scale: [2.2, 0.9, 1.4] },
-    { type: 'box', color: 0x857a6d, position: [0.0, 0.45, 0.2], scale: [2.8, 0.9, 1.1] },
-    { type: 'cylinder', color: 0x748f84, position: [-0.8, 1.1, -0.2], scale: [0.55, 2.2, 0.55] },
-    { type: 'box', color: 0x8d7f6d, position: [1.1, 0.4, 0.9], scale: [1.6, 0.8, 1.0] },
-    { type: 'cylinder', color: 0x6f8c83, position: [-1.3, 0.95, 1.0], scale: [0.45, 1.9, 0.45] }
+    { type: 'box', color: 0x8a7766, position: [-3.2, 0.7, -2.6], scale: [1.2, 1.4, 1.2] },
+    { type: 'box', color: 0xb68b67, position: [-1.8, 0.65, -2.1], scale: [1.6, 1.3, 1.2] },
+    { type: 'box', color: 0x7b8f73, position: [0.0, 0.8, -2.4], scale: [1.3, 1.6, 1.1] },
+    { type: 'box', color: 0xa89a84, position: [2.0, 0.55, -2.2], scale: [1.4, 1.1, 1.5] },
+    { type: 'box', color: 0x6d7f6f, position: [3.4, 0.9, -1.8], scale: [1.0, 1.8, 1.0] },
+    { type: 'box', color: 0xc6b29a, position: [-2.8, 0.45, -0.8], scale: [1.8, 0.9, 1.4] },
+    { type: 'box', color: 0x857a6d, position: [-1.0, 0.45, -0.1], scale: [2.0, 0.9, 1.1] },
+    { type: 'box', color: 0x748f84, position: [1.1, 0.7, -0.2], scale: [1.1, 1.4, 1.0] },
+    { type: 'box', color: 0x8d7f6d, position: [2.8, 0.5, 0.2], scale: [1.6, 1.0, 1.0] },
+    { type: 'box', color: 0x6f8c83, position: [-3.0, 0.95, 1.0], scale: [1.0, 1.9, 1.0] },
+    { type: 'box', color: 0x9f8c73, position: [-1.3, 0.95, 1.0], scale: [1.2, 1.9, 1.2] },
+    { type: 'box', color: 0x6f7b88, position: [0.8, 0.5, 1.1], scale: [1.8, 1.0, 1.3] },
+    { type: 'box', color: 0x8c7e70, position: [2.6, 0.8, 1.6], scale: [1.1, 1.6, 1.4] },
+    { type: 'box', color: 0x768c72, position: [-2.4, 0.55, 2.6], scale: [1.7, 1.1, 1.2] },
+    { type: 'box', color: 0xb39d86, position: [-0.2, 0.45, 2.3], scale: [2.4, 0.9, 1.2] },
+    { type: 'box', color: 0x7b8b8f, position: [1.9, 0.85, 2.5], scale: [1.2, 1.7, 1.2] },
+    { type: 'box', color: 0x8a7f74, position: [3.4, 0.6, 2.8], scale: [1.3, 1.2, 1.1] }
   ];
 
   for (const spec of clutterSpecs) {
@@ -123,8 +132,8 @@ export function createReferenceAnchors(scene) {
     { base: 0x8a4b4a, cap: 0xff9d9a },
     { base: 0x7a6634, cap: 0xf4da84 },
     { base: 0x4f7b40, cap: 0xaee58f },
-    { base: 0x2f6f68, cap: 0x8edfd6 },
-    { base: 0x3e6292, cap: 0x9dc5ff },
+    { base: 0x111111, cap: 0x2a2a2a },
+    { base: 0xe8e8e8, cap: 0xffffff },
     { base: 0x5f4f9e, cap: 0xbcaeff },
     { base: 0x7a4b86, cap: 0xe1aef0 },
     { base: 0x8a5640, cap: 0xf0b58f }

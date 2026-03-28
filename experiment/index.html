@@ -46,6 +46,10 @@
             margin: 0;
         }
 
+        #instruction-stage {
+            font-size: 16px;
+        }
+
         .title {
             margin: 4px 0 0;
             font-size: 28px;
@@ -127,16 +131,29 @@
             position: fixed;
             top: 14px;
             right: 14px;
-            width: min(360px, calc(100vw - 28px));
+            width: min(420px, calc(100vw - 28px));
             z-index: 20;
         }
 
         #reference-canvas {
             width: 100%;
-            aspect-ratio: 16 / 10;
+            aspect-ratio: 4 / 3;
             border-radius: 12px;
-            margin-top: 12px;
             background: #d9e1d7;
+        }
+
+        #reference-canvas-secondary {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: 12px;
+            background: #d9e1d7;
+        }
+
+        #reference-canvases {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 12px;
         }
 
         #metrics-grid {
@@ -273,6 +290,18 @@
             pointer-events: none;
         }
 
+        #skip-practice-button {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            z-index: 35;
+            opacity: 0.6;
+        }
+
+        #skip-practice-button:hover {
+            opacity: 1;
+        }
+
         @media (max-width: 1000px) {
             #tracking-shell {
                 display: none;
@@ -287,6 +316,10 @@
                 right: 12px;
                 top: auto;
                 bottom: 84px;
+            }
+
+            #reference-canvases {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -322,16 +355,21 @@
 
     <div id="bottom-actions">
         <button id="stage-button" type="button">I Understand</button>
+        <button id="lock-range-button" type="button" style="display:none">Lock Range</button>
         <button id="retry-practice-button" type="button">Retry</button>
         <button id="proceed-button" type="button">Continue</button>
-        <button id="reset-camera-button" type="button">Reset Camera Orbit</button>
     </div>
+
+    <button id="skip-practice-button" type="button">Skip Practice</button>
 
     <aside id="reference-panel" class="panel">
         <p class="eyebrow">Reference Panel</p>
-        <h2 class="title" style="font-size: 18px; margin-top: 2px;">Target Reference Photo</h2>
-        <p class="subtle">Match this image by adjusting camera and cube position, then press SPACE to submit.</p>
-        <canvas id="reference-canvas" width="640" height="400"></canvas>
+        <h2 class="title" style="font-size: 18px; margin-top: 2px;">Target Reference Photos</h2>
+        <p class="subtle">Use the front and side views to rebuild the structure, then press SPACE to submit.</p>
+        <div id="reference-canvases">
+            <canvas id="reference-canvas" width="640" height="400"></canvas>
+            <canvas id="reference-canvas-secondary" width="640" height="400"></canvas>
+        </div>
     </aside>
 
     <div id="timer-readout">90.0s</div>
