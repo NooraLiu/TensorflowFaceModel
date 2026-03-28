@@ -3,7 +3,7 @@
 // Mouse practice -> head+mouse practice -> ready for real tasks
 // =============================================================================
 
-import * as THREE from 'three';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
 import {
   applyOrbitToCamera,
@@ -1185,6 +1185,14 @@ function advanceRealTaskFlow() {
     realTask.pendingSurveyCondition = realTask.conditionOrder[0];
     setStage(STAGES.SURVEY_BREAK);
     updateStatus(`${formatConditionLabel(realTask.conditionOrder[0])} complete. Please fill in the survey before continuing.`);
+    const c1 = realTask.conditionOrder[0];
+    if (window.saveParticipantData) {
+      window.saveParticipantData(
+        sessionStorage.getItem('participantId'),
+        'trials_' + c1.replace(/-/g, '_'),
+        realTask.submittedResults.filter((r) => r.condition === c1)
+      );
+    }
     return;
   }
 
@@ -1193,6 +1201,14 @@ function advanceRealTaskFlow() {
   realTask.pendingSurveyCondition = realTask.conditionOrder[1];
   setStage(STAGES.SURVEY_BREAK);
   updateStatus('All trials complete. Please fill in the final survey.');
+  const c2 = realTask.conditionOrder[1];
+  if (window.saveParticipantData) {
+    window.saveParticipantData(
+      sessionStorage.getItem('participantId'),
+      'trials_' + c2.replace(/-/g, '_'),
+      realTask.submittedResults.filter((r) => r.condition === c2)
+    );
+  }
 }
 
 function angularDifferenceDeg(aDeg, bDeg) {
@@ -1934,10 +1950,10 @@ function submitRunningRound(reason = 'space') {
   }
 
   if (isHiddenSearchMode()) {
-    const elapsedMs = Math.min(
+    const elapsedMs = Math.round(Math.min(
       RUN_CONFIG.timeLimitMs,
       Math.max(0, performance.now() - appState.round.activeStartMs)
-    );
+    ));
     const progress = getBuildProgress();
     const placementError = progress.total - progress.matched;
 
@@ -1989,10 +2005,10 @@ function submitRunningRound(reason = 'space') {
     return;
   }
 
-  const elapsedMs = Math.min(
+  const elapsedMs = Math.round(Math.min(
     RUN_CONFIG.timeLimitMs,
     Math.max(0, performance.now() - appState.round.activeStartMs)
-  );
+  ));
   const clampedTargetOrbit = clampOrbitToConstraints(target.azimuthDeg, target.elevationDeg);
 
   const positionTarget = new THREE.Vector3(target.cubePosition.x, 0.5, target.cubePosition.z);
@@ -2316,7 +2332,8 @@ function refreshUiState() {
     stageButton.style.display = 'none';
     retryPracticeButton.style.display = 'none';
     const surveyUrl = SURVEY_URLS[surveyCondition] || '#';
-    surveyLinkButton.href = surveyUrl;
+    const pid = sessionStorage.getItem('participantId') || localStorage.getItem('participantId') || '';
+    surveyLinkButton.href = pid ? `${surveyUrl}?pid=${encodeURIComponent(pid)}` : surveyUrl;
     surveyLinkButton.style.display = 'inline-block';
     proceedButton.style.display = 'block';
     proceedButton.textContent = "I've Completed the Survey";
@@ -2338,130 +2355,159 @@ function refreshUiState() {
     proceedButton.textContent = 'Continue To Real Tasks';
     proceedButton.disabled = false;
   } else {
-    finalSurveyLinkButton.href = SURVEY_URLS.final || '#';
+    const finalSurveyBase = SURVEY_URLS.final || '#';
+    const pid = sessionStorage.getItem('participantId') || localStorage.getItem('participantId') || '';
+    finalSurveyLinkButton.href = pid ? `${finalSurveyBase}?pid=${encodeURIComponent(pid)}` : finalSurveyBase;
     finalSurveyLinkButton.style.display = 'inline-block';
     proceedButton.style.display = 'none';
   }
 }
 
 function initializeHeadTracking() {
+  const reportCameraFailure = (error) => {
+    const reason = error?.name || error?.message || String(error);
+    const help = (
+      'Camera start failed. Ensure camera permission is allowed for this site, no other app is locking the webcam, and refresh the page.'
+    );
+    showError(`${help} (${reason})`);
+    updateStatus(help, true);
+  };
+
+  if (!window.isSecureContext) {
+    reportCameraFailure(new Error('Insecure context (HTTPS required).'));
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    reportCameraFailure(new Error('navigator.mediaDevices.getUserMedia unavailable.'));
+    return;
+  }
+
   const faceTrackingSystem = new MediaPipeFaceTracking({
     drawMesh: true,
     showVideo: true
   });
 
-  faceTrackingSystem.initialize((results) => {
-    if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
-      appState.tracking.faceDetected = false;
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then((stream) => {
+      stream.getTracks().forEach((track) => track.stop());
 
-      if (appState.condition === 'head-mouse' && appState.stage !== STAGES.HEAD_RESULT && appState.stage !== STAGES.READY_FOR_REAL) {
-        if (!appState.tracking.calibrated) {
-          if (appState.stage === STAGES.HEAD_INSTRUCTIONS && !appState.tracking.calibrationStarted) {
-            updateStatus('Read instructions, then click Start Calibration.');
-          } else {
-            updateStatus('Please keep your head centered and steady while calibrating.');
+      faceTrackingSystem.initialize((results) => {
+        if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+          appState.tracking.faceDetected = false;
+
+          if (appState.condition === 'head-mouse' && appState.stage !== STAGES.HEAD_RESULT && appState.stage !== STAGES.READY_FOR_REAL) {
+            if (!appState.tracking.calibrated) {
+              if (appState.stage === STAGES.HEAD_INSTRUCTIONS && !appState.tracking.calibrationStarted) {
+                updateStatus('Read instructions, then click Start Calibration.');
+              } else {
+                updateStatus('Please keep your head centered and steady while calibrating.');
+              }
+            } else {
+              updateStatus('Head orbit ready. No face detected.');
+            }
           }
-        } else {
-          updateStatus('Head orbit ready. No face detected.');
+          return;
         }
-      }
-      return;
-    }
 
-    appState.tracking.faceDetected = true;
+        appState.tracking.faceDetected = true;
 
-    if (appState.condition !== 'head-mouse') {
-      return;
-    }
+        if (appState.condition !== 'head-mouse') {
+          return;
+        }
 
-    const landmarks = results.multiFaceLandmarks[0];
-    const headPose = detectors.headPose.detectPose(landmarks);
+        const landmarks = results.multiFaceLandmarks[0];
+        const headPose = detectors.headPose.detectPose(landmarks);
 
-    if (!detectors.calibration.isCalibrated) {
-      if (!appState.tracking.calibrationStarted) {
+        if (!detectors.calibration.isCalibrated) {
+          if (!appState.tracking.calibrationStarted) {
+            if (appState.stage === STAGES.HEAD_INSTRUCTIONS) {
+              updateStatus('Read instructions, then click Start Calibration.');
+            }
+            return;
+          }
+
+          const now = performance.now();
+          if (now < appState.tracking.calibrationDelayUntilMs) {
+            const secondsRemaining = (appState.tracking.calibrationDelayUntilMs - now) / 1000;
+            updateStatus(`Please keep your head centered and steady while calibrating. Starting in ${secondsRemaining.toFixed(1)}s.`);
+            return;
+          }
+
+          const eyebrowDistance = detectors.eyebrow.calculateEyebrowDistance(landmarks);
+          detectors.calibration.addSample(eyebrowDistance, headPose.turn, headPose.tilt, headPose.roll);
+          appState.tracking.progress = detectors.calibration.getProgress();
+          updateStatus(`Please keep your head centered and steady while calibrating. ${appState.tracking.progress}%`);
+
+          if (detectors.calibration.isCalibrated) {
+            const baselines = detectors.calibration.getHeadPoseBaselines();
+            detectors.eyebrow.setBaselines(detectors.calibration.eyebrowBaseline, baselines);
+            appState.tracking.calibrated = true;
+            syncOrbitStateFromCamera();
+            appState.tracking.headOrbitCenterAzimuthDeg = appState.orbit.azimuthDeg;
+            appState.tracking.headOrbitCenterElevationDeg = appState.orbit.elevationDeg;
+            updateStatus('Calibration done! Now turn your head fully left/right and up/down to set your range.');
+          }
+          return;
+        }
+
+        // Track live peaks for auto-range detection during HEAD_INSTRUCTIONS (until locked)
+        if (appState.stage === STAGES.HEAD_INSTRUCTIONS && !appState.tracking.rangeLocked) {
+          const absTurn = Math.abs(appState.tracking.filteredHeadMovement.turn);
+          const absTilt = Math.abs(appState.tracking.filteredHeadMovement.tilt);
+          if (absTurn > appState.tracking.peakTurnObserved) {
+            appState.tracking.peakTurnObserved = absTurn;
+          }
+          if (absTilt > appState.tracking.peakTiltObserved) {
+            appState.tracking.peakTiltObserved = absTilt;
+          }
+        }
+
+        appState.tracking.headMovement = detectors.calibration.getHeadMovement(
+          headPose.turn,
+          headPose.tilt,
+          headPose.roll
+        );
+
+        const baseSmooth = HEAD_ORBIT_CONFIG.smoothing;
+        const microSmooth = HEAD_ORBIT_CONFIG.microSmoothing;
+        const jitterThreshold = HEAD_ORBIT_CONFIG.jitterThreshold;
+
+        const turnDelta = appState.tracking.headMovement.turn - appState.tracking.filteredHeadMovement.turn;
+        const tiltDelta = appState.tracking.headMovement.tilt - appState.tracking.filteredHeadMovement.tilt;
+        const rollDelta = appState.tracking.headMovement.roll - appState.tracking.filteredHeadMovement.roll;
+
+        const blendTurn = THREE.MathUtils.clamp(Math.abs(turnDelta) / jitterThreshold, 0, 1);
+        const blendTilt = THREE.MathUtils.clamp(Math.abs(tiltDelta) / jitterThreshold, 0, 1);
+        const blendRoll = THREE.MathUtils.clamp(Math.abs(rollDelta) / jitterThreshold, 0, 1);
+
+        const turnSmooth = THREE.MathUtils.lerp(microSmooth, baseSmooth, blendTurn * blendTurn);
+        const tiltSmooth = THREE.MathUtils.lerp(microSmooth, baseSmooth, blendTilt * blendTilt);
+        const rollSmooth = THREE.MathUtils.lerp(microSmooth, baseSmooth, blendRoll * blendRoll);
+
+        appState.tracking.filteredHeadMovement.turn += turnDelta * turnSmooth;
+        appState.tracking.filteredHeadMovement.tilt += tiltDelta * tiltSmooth;
+        appState.tracking.filteredHeadMovement.roll += rollDelta * rollSmooth;
+
+        const yaw = appState.tracking.filteredHeadMovement.turn;
+        const pitch = appState.tracking.filteredHeadMovement.tilt;
+
         if (appState.stage === STAGES.HEAD_INSTRUCTIONS) {
-          updateStatus('Read instructions, then click Start Calibration.');
+          const peakY = appState.tracking.peakTurnObserved;
+          const peakP = appState.tracking.peakTiltObserved;
+          updateStatus(
+            `Yaw ${yaw.toFixed(3)} (peak ${peakY.toFixed(3)})  |  Pitch ${pitch.toFixed(3)} (peak ${peakP.toFixed(3)})`
+          );
+        } else if (appState.stage === STAGES.HEAD_COUNTDOWN || appState.stage === STAGES.HEAD_RUNNING) {
+          updateStatus(
+            `Yaw ${yaw.toFixed(3)} / ±${HEAD_ORBIT_CONFIG.yawMaxInput.toFixed(3)}  |  Pitch ${pitch.toFixed(3)} / ±${HEAD_ORBIT_CONFIG.pitchMaxInput.toFixed(3)}`
+          );
         }
-        return;
-      }
-
-      const now = performance.now();
-      if (now < appState.tracking.calibrationDelayUntilMs) {
-        const secondsRemaining = (appState.tracking.calibrationDelayUntilMs - now) / 1000;
-        updateStatus(`Please keep your head centered and steady while calibrating. Starting in ${secondsRemaining.toFixed(1)}s.`);
-        return;
-      }
-
-      const eyebrowDistance = detectors.eyebrow.calculateEyebrowDistance(landmarks);
-      detectors.calibration.addSample(eyebrowDistance, headPose.turn, headPose.tilt, headPose.roll);
-      appState.tracking.progress = detectors.calibration.getProgress();
-      updateStatus(`Please keep your head centered and steady while calibrating. ${appState.tracking.progress}%`);
-
-      if (detectors.calibration.isCalibrated) {
-        const baselines = detectors.calibration.getHeadPoseBaselines();
-        detectors.eyebrow.setBaselines(detectors.calibration.eyebrowBaseline, baselines);
-        appState.tracking.calibrated = true;
-        syncOrbitStateFromCamera();
-        appState.tracking.headOrbitCenterAzimuthDeg = appState.orbit.azimuthDeg;
-        appState.tracking.headOrbitCenterElevationDeg = appState.orbit.elevationDeg;
-        updateStatus('Calibration done! Now turn your head fully left/right and up/down to set your range.');
-      }
-      return;
-    }
-
-    // Track live peaks for auto-range detection during HEAD_INSTRUCTIONS (until locked)
-    if (appState.stage === STAGES.HEAD_INSTRUCTIONS && !appState.tracking.rangeLocked) {
-      const absTurn = Math.abs(appState.tracking.filteredHeadMovement.turn);
-      const absTilt = Math.abs(appState.tracking.filteredHeadMovement.tilt);
-      if (absTurn > appState.tracking.peakTurnObserved) {
-        appState.tracking.peakTurnObserved = absTurn;
-      }
-      if (absTilt > appState.tracking.peakTiltObserved) {
-        appState.tracking.peakTiltObserved = absTilt;
-      }
-    }
-
-    appState.tracking.headMovement = detectors.calibration.getHeadMovement(
-      headPose.turn,
-      headPose.tilt,
-      headPose.roll
-    );
-
-    const baseSmooth = HEAD_ORBIT_CONFIG.smoothing;
-    const microSmooth = HEAD_ORBIT_CONFIG.microSmoothing;
-    const jitterThreshold = HEAD_ORBIT_CONFIG.jitterThreshold;
-
-    const turnDelta = appState.tracking.headMovement.turn - appState.tracking.filteredHeadMovement.turn;
-    const tiltDelta = appState.tracking.headMovement.tilt - appState.tracking.filteredHeadMovement.tilt;
-    const rollDelta = appState.tracking.headMovement.roll - appState.tracking.filteredHeadMovement.roll;
-
-    const blendTurn = THREE.MathUtils.clamp(Math.abs(turnDelta) / jitterThreshold, 0, 1);
-    const blendTilt = THREE.MathUtils.clamp(Math.abs(tiltDelta) / jitterThreshold, 0, 1);
-    const blendRoll = THREE.MathUtils.clamp(Math.abs(rollDelta) / jitterThreshold, 0, 1);
-
-    const turnSmooth = THREE.MathUtils.lerp(microSmooth, baseSmooth, blendTurn * blendTurn);
-    const tiltSmooth = THREE.MathUtils.lerp(microSmooth, baseSmooth, blendTilt * blendTilt);
-    const rollSmooth = THREE.MathUtils.lerp(microSmooth, baseSmooth, blendRoll * blendRoll);
-
-    appState.tracking.filteredHeadMovement.turn += turnDelta * turnSmooth;
-    appState.tracking.filteredHeadMovement.tilt += tiltDelta * tiltSmooth;
-    appState.tracking.filteredHeadMovement.roll += rollDelta * rollSmooth;
-
-    const yaw = appState.tracking.filteredHeadMovement.turn;
-    const pitch = appState.tracking.filteredHeadMovement.tilt;
-
-    if (appState.stage === STAGES.HEAD_INSTRUCTIONS) {
-      const peakY = appState.tracking.peakTurnObserved;
-      const peakP = appState.tracking.peakTiltObserved;
-      updateStatus(
-        `Yaw ${yaw.toFixed(3)} (peak ${peakY.toFixed(3)})  |  Pitch ${pitch.toFixed(3)} (peak ${peakP.toFixed(3)})`
-      );
-    } else if (appState.stage === STAGES.HEAD_COUNTDOWN || appState.stage === STAGES.HEAD_RUNNING) {
-      updateStatus(
-        `Yaw ${yaw.toFixed(3)} / ±${HEAD_ORBIT_CONFIG.yawMaxInput.toFixed(3)}  |  Pitch ${pitch.toFixed(3)} / ±${HEAD_ORBIT_CONFIG.pitchMaxInput.toFixed(3)}`
-      );
-    }
-  });
+      });
+    })
+    .catch((error) => {
+      reportCameraFailure(error);
+    });
 }
 
 function tickRoundTimer() {

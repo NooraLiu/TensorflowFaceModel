@@ -1,0 +1,13 @@
+{
+  "name": "tensorflow-face-model-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "export:participants": "node scripts/export-firestore.mjs",
+    "export:trials-csv": "node scripts/export-trials-csv.mjs",
+    "export:all": "npm run export:participants -- --project experiment-fb083 --serviceAccount service-account-experiment-fb083.json --out exports/participants.json && npm run export:trials-csv -- --in exports/participants.json --out exports/trials.csv --surveyOut exports/surveys.csv"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

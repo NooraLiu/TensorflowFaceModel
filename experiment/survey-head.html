@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Head+Mouse NASA-TLX Survey</title>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="./firebase-config.js"></script>
+  <script src="./firebase-service.js"></script>
   <style>
     :root {
       --bg: #101421;
@@ -184,7 +188,7 @@
       <textarea id="notes" rows="4" placeholder="Optional comments"></textarea>
     </div>
 
-    <button id="save-btn" type="button">Compute + Download JSON</button>
+    <button id="save-btn" type="button">Save Survey</button>
     <div id="done" class="note"></div>
   </main>
 
@@ -289,10 +293,19 @@
       URL.revokeObjectURL(url);
     }
 
+    function getParticipantId() {
+      const params = new URLSearchParams(window.location.search);
+      const pidFromQuery = params.get('pid');
+      const pid = pidFromQuery || localStorage.getItem('participantId') || sessionStorage.getItem('participantId') || '';
+      if (pid) {
+        localStorage.setItem('participantId', pid);
+        sessionStorage.setItem('participantId', pid);
+      }
+      return pid || null;
+    }
+
     document.getElementById('save-btn').addEventListener('click', () => {
       const result = scoreSurvey();
-      const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-      downloadJson(result, `survey-${CONDITION}-${stamp}.json`);
 
       const done = document.getElementById('done');
       const raw = result.nasaTlx.rawScore;
@@ -300,6 +313,14 @@
         ? `Usability score = ${result.usability.score} / 100`
         : 'Usability score not computed (answer all 8 items).';
       done.textContent = `Saved. Raw TLX = ${raw}. ${usabilityText}`;
+
+      const pid = getParticipantId();
+      if (window.saveParticipantData && pid) {
+        window.saveParticipantData(pid, 'survey_' + CONDITION.replace(/-/g, '_'), result)
+          .then(() => { done.textContent += ' \u2713 Uploaded.'; });
+      } else {
+        done.textContent += ' (No participant ID found; cloud upload skipped.)';
+      }
     });
 
     renderDimensions();

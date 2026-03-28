@@ -1,0 +1,28 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "firestore.rules",
+      "README.md",
+      "project_paper.md",
+      "project_paper.tex",
+      "architecture-diagram.md",
+      "Legacy/**",
+      "example_*/**",
+      "**/*.ipynb",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "redirects": [
+      {
+        "source": "/",
+        "destination": "/experiment/consent.html",
+        "type": 302
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

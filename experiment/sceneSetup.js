@@ -3,8 +3,8 @@
 // Fixed-target, fixed-distance camera orbit shared by both experiment conditions
 // =============================================================================
 
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 
 export const CAMERA_CONSTRAINTS = {
   target: new THREE.Vector3(0, 0.5, 0),

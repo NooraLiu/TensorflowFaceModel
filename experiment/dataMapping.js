@@ -3,7 +3,7 @@
 // Maps face detection data to 3D movement and visual effects
 // =============================================================================
 
-import * as THREE from 'three';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
 // =============================================================================
 // MOVEMENT CONTROLLER

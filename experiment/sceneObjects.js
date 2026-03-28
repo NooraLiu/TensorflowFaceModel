@@ -3,7 +3,7 @@
 // Creates the shared experiment scene with clean and clustered variants
 // =============================================================================
 
-import * as THREE from 'three';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
 export const SCENE_BOUNDS = {
   minX: -6.2,

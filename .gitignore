@@ -1,0 +1,12 @@
+# Firebase / Node
+node_modules/
+
+# Service account secrets
+service-account*.json
+*serviceAccount*.json
+
+# Local exports
+exports/
+
+# OS/editor
+.DS_Store

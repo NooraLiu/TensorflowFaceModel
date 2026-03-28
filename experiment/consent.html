@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Informed Consent — Photo Replication Experiment</title>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="./firebase-config.js"></script>
+  <script src="./firebase-service.js"></script>
   <style>
     :root {
       --bg: #0f1612;
@@ -229,7 +233,7 @@
     const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
     document.getElementById('sig-date').value = today;
 
-    document.getElementById('begin-btn').addEventListener('click', () => {
+    document.getElementById('begin-btn').addEventListener('click', async () => {
       const allChecked = ['c1', 'c2', 'c3', 'c4'].every((id) => document.getElementById(id).checked);
       const name = document.getElementById('sig-name').value.trim();
       const errEl = document.getElementById('error-msg');
@@ -246,9 +250,18 @@
       errEl.textContent = '';
 
       sessionStorage.setItem('participantId', participantId);
+      localStorage.setItem('participantId', participantId);
       sessionStorage.setItem('consentGiven', 'true');
       sessionStorage.setItem('consentSignature', name);
       sessionStorage.setItem('consentTimestamp', new Date().toISOString());
+
+      if (window.saveParticipantData) {
+        await window.saveParticipantData(participantId, 'consent', {
+          signature: name,
+          timestamp: new Date().toISOString(),
+          participantId
+        });
+      }
 
       window.location.href = 'index.html';
     });
