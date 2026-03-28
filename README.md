@@ -72,7 +72,7 @@ Outlier and Data Exclusion Criteria:
 1. Introduction (5 min): Participants receive an overview of the study and sign the informed consent form.
 2. Pre-Study Questionnaire (3 min): 3D software experience (hours).
 3. Calibration — Phase 1 (<1 min): A ~30-frame (~1 second) calibration period to establish a personalized "neutral" head baseline. Participants are instructed to look directly at the center of the screen in a comfortable, natural posture and remain still.
-4. Calibration — Phase 2: Head Movement Range (<2 min): Participants move their head comfortably left/right and up/down to define their personal movement range. When the range feels comfortable and representative, they click "Lock Range." A 82% buffer is applied to the peak observed values so that users can reach the full camera orbit range without reproducing their absolute peak movement on every trial.
+4. Calibration — Phase 2: Head Movement Range (<2 min): Participants move their head comfortably left/right and up/down to define their personal movement range. When the range feels comfortable and representative, they click "Lock Range." A 75% buffer is applied to the peak observed values so that users can reach the full camera orbit range without reproducing their absolute peak movement on every trial.
 5. Training Phase (4 min per condition, 8 min total):
 - 2 practice trials per control method with on-screen guidance and reference photos shown throughout.
 - Training order matches experimental condition order.

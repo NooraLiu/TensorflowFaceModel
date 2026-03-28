@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mouse-Only NASA-TLX Survey</title>
+  <style>
+    :root {
+      --bg: #0f1612;
+      --card: rgba(20, 31, 24, 0.94);
+      --border: rgba(198, 222, 200, 0.3);
+      --text: #eef5ea;
+      --muted: #c7d5c9;
+      --accent: #9fc29f;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 14px;
+    }
+    .card {
+      width: min(940px, calc(100vw - 28px));
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.35);
+    }
+    h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+    h2 {
+      margin: 20px 0 8px;
+      font-size: 18px;
+      color: var(--accent);
+    }
+    p {
+      line-height: 1.45;
+      color: var(--muted);
+      margin: 8px 0;
+    }
+    .dim {
+      margin-top: 14px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .dim-title {
+      font-weight: 700;
+    }
+    .dim-desc {
+      margin-top: 6px;
+      font-size: 14px;
+    }
+    .scale {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 130px 1fr 40px;
+      gap: 8px;
+      align-items: center;
+    }
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(159, 194, 159, 0.25);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #9fc29f;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(159, 194, 159, 0.55);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border: none;
+      border-radius: 50%;
+      background: #9fc29f;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(159, 194, 159, 0.55);
+    }
+    .sus-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+    .sus-table th, .sus-table td {
+      padding: 8px 6px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .sus-table th {
+      color: var(--accent);
+      font-size: 13px;
+    }
+    .sus-table .sus-item-col {
+      text-align: left;
+      width: 55%;
+      padding-left: 8px;
+    }
+    .sus-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    select, textarea {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font: inherit;
+    }
+    button {
+      margin-top: 16px;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #5e7d55, #2a3a2a);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .note {
+      margin-top: 10px;
+      color: var(--accent);
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 720px) {
+      .scale {
+        grid-template-columns: 1fr;
+      }
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Mouse-Only Condition Survey</h1>
+    <p>Academic NASA-TLX format. Rate each dimension from 0 to 100 in steps of 5.</p>
+
+    <h2>1. Raw NASA-TLX Ratings (Required)</h2>
+    <div id="dimensions"></div>
+
+    <h2>2. Usability &amp; Experience</h2>
+    <p>Rate how much you agree with each statement about the <strong>Mouse-Only</strong> control method. 1 = Strongly Disagree, 5 = Strongly Agree.</p>
+    <table class="sus-table">
+      <thead>
+        <tr>
+          <th class="sus-item-col">Statement</th>
+          <th>1<br><small>Strongly<br>Disagree</small></th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5<br><small>Strongly<br>Agree</small></th>
+        </tr>
+      </thead>
+      <tbody id="usability-body"></tbody>
+    </table>
+
+    <div class="field" style="margin-top:12px;">
+      <label for="notes">Comments</label>
+      <textarea id="notes" rows="4" placeholder="Optional comments"></textarea>
+    </div>
+
+    <button id="save-btn" type="button">Compute + Download JSON</button>
+    <div id="done" class="note"></div>
+  </main>
+
+  <script>
+    const CONDITION = 'mouse-only';
+    const DIMENSIONS = [
+      { id: 'mental', label: 'Mental Demand', left: 'Low', right: 'High', desc: 'How mentally demanding was the task?' },
+      { id: 'physical', label: 'Physical Demand', left: 'Low', right: 'High', desc: 'How physically demanding was the task?' },
+      { id: 'temporal', label: 'Temporal Demand', left: 'Low', right: 'High', desc: 'How hurried or rushed was the pace?' },
+      { id: 'performance', label: 'Performance', left: 'Perfect', right: 'Failure', desc: 'How successful were you in accomplishing the task?' },
+      { id: 'effort', label: 'Effort', left: 'Low', right: 'High', desc: 'How hard did you have to work?' },
+      { id: 'frustration', label: 'Frustration', left: 'Low', right: 'High', desc: 'How insecure, discouraged, irritated, stressed, and annoyed were you?' }
+    ];
+
+    function renderDimensions() {
+      const root = document.getElementById('dimensions');
+      root.innerHTML = DIMENSIONS.map((d) => `
+        <section class="dim">
+          <div class="dim-title">${d.label}</div>
+          <div class="dim-desc">${d.desc}</div>
+          <div class="scale">
+            <span>${d.left}</span>
+            <input id="dim-${d.id}" type="range" min="0" max="100" step="5" value="50" />
+            <strong id="val-${d.id}">50</strong>
+          </div>
+          <div class="dim-desc" style="text-align:right;">${d.right}</div>
+        </section>
+      `).join('');
+
+      DIMENSIONS.forEach((d) => {
+        const input = document.getElementById(`dim-${d.id}`);
+        const out = document.getElementById(`val-${d.id}`);
+        input.addEventListener('input', () => {
+          out.textContent = input.value;
+        });
+      });
+    }
+
+    const USABILITY_ITEMS = [
+      'This control method felt intuitive to use.',
+      'I was able to learn this control method quickly.',
+      'I felt in control of the camera\'s movement.',
+      'I could position the camera precisely where I wanted.',
+      'This method was physically comfortable to use.',
+      'Physical fatigue from using this method was minimal.',
+      'I felt confident using this control method.',
+      'I would be willing to use this method for future 3D tasks.'
+    ];
+
+    function renderUsability() {
+      const tbody = document.getElementById('usability-body');
+      tbody.innerHTML = USABILITY_ITEMS.map((text, idx) => `
+        <tr>
+          <td class="sus-item-col">${idx + 1}. ${text}</td>
+          ${[1, 2, 3, 4, 5].map((v) => `<td><input type="radio" name="q-${idx + 1}" value="${v}" /></td>`).join('')}
+        </tr>
+      `).join('');
+    }
+
+    function scoreSurvey() {
+      const ratings = {};
+      DIMENSIONS.forEach((d) => {
+        ratings[d.id] = Number(document.getElementById(`dim-${d.id}`).value);
+      });
+      const rawTlx = Object.values(ratings).reduce((s, n) => s + n, 0) / DIMENSIONS.length;
+
+      const usabilityRaw = [];
+      for (let i = 1; i <= USABILITY_ITEMS.length; i += 1) {
+        const checked = document.querySelector(`input[name="q-${i}"]:checked`);
+        usabilityRaw.push(checked ? Number(checked.value) : null);
+      }
+      const usabilityComplete = usabilityRaw.every((v) => v !== null);
+      let usabilityScore = null;
+      if (usabilityComplete) {
+        const sum = usabilityRaw.reduce((s, v) => s + v, 0);
+        usabilityScore = Number(((sum - USABILITY_ITEMS.length) / (4 * USABILITY_ITEMS.length) * 100).toFixed(1));
+      }
+
+      return {
+        condition: CONDITION,
+        timestampIso: new Date().toISOString(),
+        nasaTlx: {
+          rawScore: Number(rawTlx.toFixed(2)),
+          ratings
+        },
+        usability: {
+          score: usabilityScore,
+          itemResponses: usabilityRaw,
+          complete: usabilityComplete
+        },
+        comments: document.getElementById('notes').value.trim() || null
+      };
+    }
+
+    function downloadJson(obj, fileName) {
+      const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('save-btn').addEventListener('click', () => {
+      const result = scoreSurvey();
+      const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+      downloadJson(result, `survey-${CONDITION}-${stamp}.json`);
+
+      const done = document.getElementById('done');
+      const raw = result.nasaTlx.rawScore;
+      const usabilityText = result.usability.complete
+        ? `Usability score = ${result.usability.score} / 100`
+        : 'Usability score not computed (answer all 8 items).';
+      done.textContent = `Saved. Raw TLX = ${raw}. ${usabilityText}`;
+    });
+
+    renderDimensions();
+    renderUsability();
+  </script>
+</body>
+</html>

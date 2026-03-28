@@ -40,7 +40,15 @@ const STAGES = {
   HEAD_COUNTDOWN: 'head-countdown',
   HEAD_RUNNING: 'head-running',
   HEAD_RESULT: 'head-result',
+  SURVEY_BREAK: 'survey-break',
   READY_FOR_REAL: 'ready-for-real'
+};
+
+// Update these URLs before running the experiment.
+const SURVEY_URLS = {
+  'mouse-only': 'survey-mouse.html',
+  'head-mouse': 'survey-head.html',
+  final: 'survey-final.html'
 };
 
 const TASK_MODES = {
@@ -120,8 +128,8 @@ const HEAD_ORBIT_CONFIG = {
 };
 
 const HEAD_RANGE_LOCK_BUFFER = {
-  yawFactor: 0.82,
-  pitchFactor: 0.82,
+  yawFactor: 0.75,
+  pitchFactor: 0.75,
   minYaw: 0.01,
   minPitch: 0.002
 };
@@ -159,6 +167,7 @@ const appState = {
     countdownActive: false,
     countdownValue: RUN_CONFIG.countdownSeconds,
     countdownDeadlineMs: 0,
+    repositionCounts: [0, 0, 0, 0, 0],
     practiceSceneType: null,
     targetByCondition: {
       'mouse-only': null,
@@ -179,7 +188,8 @@ const appState = {
       currentTrialIndex: 0,
       headCalibrationCompleted: false,
       trialPairs: [],
-      submittedResults: []
+      submittedResults: [],
+      pendingSurveyCondition: null
     },
     hiddenSearch: {
       activeMeshes: [],
@@ -262,6 +272,9 @@ const proceedButton = document.getElementById('proceed-button');
 const retryPracticeButton = document.getElementById('retry-practice-button');
 const recalibrateButton = document.getElementById('recalibrate-button');
 const skipPracticeButton = document.getElementById('skip-practice-button');
+const surveyLinkButton = document.getElementById('survey-link-button');
+const finalSurveyLinkButton = document.getElementById('final-survey-link-button');
+const skipRealTaskButton = document.getElementById('skip-real-task-button');
 
 const conditionReadout = document.getElementById('condition-readout');
 const sceneReadout = document.getElementById('scene-readout');
@@ -270,6 +283,7 @@ const elevationReadout = document.getElementById('elevation-readout');
 const phaseReadout = document.getElementById('phase-readout');
 const trialReadout = document.getElementById('trial-readout');
 const timerReadout = document.getElementById('timer-readout');
+const trialCounter = document.getElementById('trial-counter');
 const positionErrorReadout = document.getElementById('position-error-readout');
 const cameraErrorReadout = document.getElementById('camera-error-readout');
 
@@ -294,7 +308,9 @@ const dragState = {
   raycaster: new THREE.Raycaster(),
   pointer: new THREE.Vector2(),
   dragPlane: new THREE.Plane(new THREE.Vector3(0, 1, 0), 0),
-  dragPoint: new THREE.Vector3()
+  dragPoint: new THREE.Vector3(),
+  startX: 0,
+  startZ: 0
 };
 
 function showError(message) {
@@ -1064,6 +1080,7 @@ function resetRoundState() {
   appState.round.remainingMs = RUN_CONFIG.timeLimitMs;
   appState.round.countdownActive = false;
   appState.round.countdownValue = RUN_CONFIG.countdownSeconds;
+  appState.round.repositionCounts = [0, 0, 0, 0, 0];
   clearHiddenSearchMeshes();
 }
 
@@ -1165,20 +1182,17 @@ function advanceRealTaskFlow() {
   }
 
   if (realTask.currentConditionOrderIndex === 0) {
-    realTask.currentConditionOrderIndex = 1;
-    realTask.currentCondition = realTask.conditionOrder[1];
-    realTask.currentTrialIndex = 0;
-    loadRealTaskTargetsForCurrentTrial();
-    setConditionInstructionStage(realTask.currentCondition);
-    applyTargetSceneForCurrentCondition();
-    updateStatus(`Switched condition. Continue with ${formatConditionLabel(realTask.currentCondition)}.`);
+    realTask.pendingSurveyCondition = realTask.conditionOrder[0];
+    setStage(STAGES.SURVEY_BREAK);
+    updateStatus(`${formatConditionLabel(realTask.conditionOrder[0])} complete. Please fill in the survey before continuing.`);
     return;
   }
 
   realTask.active = false;
   realTask.completed = true;
-  setStage(STAGES.READY_FOR_REAL);
-  updateStatus('Real tasks complete. Thank you.');
+  realTask.pendingSurveyCondition = realTask.conditionOrder[1];
+  setStage(STAGES.SURVEY_BREAK);
+  updateStatus('All trials complete. Please fill in the final survey.');
 }
 
 function angularDifferenceDeg(aDeg, bDeg) {
@@ -1513,6 +1527,8 @@ function handlePointerDown(event) {
   dragState.isDragging = true;
   dragState.pointerId = event.pointerId;
   dragState.offset.set(dragState.activeMesh.position.x - intersection.x, 0, dragState.activeMesh.position.z - intersection.z);
+  dragState.startX = dragState.activeMesh.position.x;
+  dragState.startZ = dragState.activeMesh.position.z;
   appState.draggingCube = true;
   renderer.domElement.setPointerCapture(event.pointerId);
   controls.enabled = false;
@@ -1524,10 +1540,23 @@ function stopDragging(pointerId) {
     return;
   }
 
+  const movedMesh = dragState.activeMesh;
   dragState.isDragging = false;
   dragState.pointerId = null;
   dragState.activeMesh = null;
   appState.draggingCube = false;
+
+  if (
+    appState.round.realTask.active &&
+    appState.round.running &&
+    movedMesh &&
+    (Math.abs(movedMesh.position.x - dragState.startX) > 0.01 ||
+      Math.abs(movedMesh.position.z - dragState.startZ) > 0.01)
+  ) {
+    const idx = movedMesh.userData.blockIndex ?? 0;
+    appState.round.repositionCounts[idx] = (appState.round.repositionCounts[idx] || 0) + 1;
+  }
+
   applyControlMode();
   setCanvasCursor('default');
 }
@@ -1923,6 +1952,7 @@ function submitRunningRound(reason = 'space') {
 
     if (appState.round.realTask.active) {
       appState.round.realTask.submittedResults.push({
+        participantId: sessionStorage.getItem('participantId') || null,
         mode: appState.taskMode,
         stage: appState.stage,
         condition: appState.condition,
@@ -1931,7 +1961,9 @@ function submitRunningRound(reason = 'space') {
         elapsedMs,
         hiddenFoundCount: progress.matched,
         hiddenTotalCount: progress.total,
-        positionError: placementError
+        positionError: placementError,
+        repositionCounts: [...appState.round.repositionCounts],
+        totalRepositions: appState.round.repositionCounts.reduce((s, c) => s + c, 0)
       });
     }
 
@@ -1997,6 +2029,7 @@ function submitRunningRound(reason = 'space') {
 
   if (appState.round.realTask.active) {
     appState.round.realTask.submittedResults.push({
+      participantId: sessionStorage.getItem('participantId') || null,
       mode: appState.taskMode,
       stage: appState.stage,
       condition: appState.condition,
@@ -2004,7 +2037,9 @@ function submitRunningRound(reason = 'space') {
       reason,
       elapsedMs,
       positionError,
-      cameraErrorDeg
+      cameraErrorDeg,
+      repositionCounts: [...appState.round.repositionCounts],
+      totalRepositions: appState.round.repositionCounts.reduce((s, c) => s + c, 0)
     });
   }
 
@@ -2090,9 +2125,25 @@ function refreshUiState() {
   const isPracticeStage = !appState.round.realTask.active && appState.stage !== STAGES.READY_FOR_REAL;
   skipPracticeButton.style.display = isPracticeStage ? 'block' : 'none';
 
+  const showSkipRealTaskButton =
+    appState.round.realTask.active &&
+    appState.stage !== STAGES.SURVEY_BREAK;
+  skipRealTaskButton.style.display = showSkipRealTaskButton ? 'block' : 'none';
+
+  if (appState.round.realTask.active && !appState.round.realTask.completed) {
+    const t = appState.round.realTask.currentTrialIndex + 1;
+    const total = appState.round.realTask.totalTrialsPerCondition;
+    trialCounter.textContent = `Trial ${t} / ${total}`;
+    trialCounter.style.display = 'block';
+  } else {
+    trialCounter.style.display = 'none';
+  }
+
   stageButton.style.display = 'block';
   lockRangeButton.style.display = 'none';
   retryPracticeButton.style.display = 'none';
+  surveyLinkButton.style.display = 'none';
+  finalSurveyLinkButton.style.display = 'none';
   proceedButton.style.display = 'none';
 
   if (appState.stage === STAGES.MOUSE_INSTRUCTIONS) {
@@ -2252,11 +2303,33 @@ function refreshUiState() {
     return;
   }
 
+  if (appState.stage === STAGES.SURVEY_BREAK) {
+    const surveyCondition = appState.round.realTask.pendingSurveyCondition;
+    const isFinal = appState.round.realTask.completed;
+    const conditionLabel = formatConditionLabel(surveyCondition);
+    instructionStage.textContent = isFinal ? 'Final Survey' : 'Mid-Experiment Survey';
+    instructionTitle.textContent = `${conditionLabel} Survey`;
+    trialReadout.textContent = isFinal ? 'All Trials Complete' : 'Condition Complete';
+    instructions.textContent = isFinal
+      ? `Please complete the survey for the ${conditionLabel} condition. Click "Open Survey" to open it in a new tab, then return here and click "I've Completed the Survey" to continue.`
+      : `Please complete the survey for the ${conditionLabel} condition. Click "Open Survey" to open it in a new tab, then return here and click "I've Completed the Survey" to continue.`;
+    stageButton.style.display = 'none';
+    retryPracticeButton.style.display = 'none';
+    const surveyUrl = SURVEY_URLS[surveyCondition] || '#';
+    surveyLinkButton.href = surveyUrl;
+    surveyLinkButton.style.display = 'inline-block';
+    proceedButton.style.display = 'block';
+    proceedButton.textContent = "I've Completed the Survey";
+    proceedButton.disabled = false;
+    return;
+  }
+
+  surveyLinkButton.style.display = 'none';
   instructionStage.textContent = appState.round.realTask.completed ? 'Complete' : 'Practice Complete';
   instructionTitle.textContent = appState.round.realTask.completed ? 'Real Tasks Complete' : 'Ready For Real Tasks';
   trialReadout.textContent = appState.round.realTask.completed ? 'All Trials Complete' : 'Practice Complete';
   instructions.textContent = appState.round.realTask.completed
-    ? 'All real task trials are complete. You can now end the session.'
+    ? 'All real task trials are complete. Please complete the final survey, then end the session.'
     : 'Guided practice complete. Press Continue to start the real task flow.';
   stageButton.style.display = 'none';
   retryPracticeButton.style.display = 'none';
@@ -2265,6 +2338,8 @@ function refreshUiState() {
     proceedButton.textContent = 'Continue To Real Tasks';
     proceedButton.disabled = false;
   } else {
+    finalSurveyLinkButton.href = SURVEY_URLS.final || '#';
+    finalSurveyLinkButton.style.display = 'inline-block';
     proceedButton.style.display = 'none';
   }
 }
@@ -2420,6 +2495,19 @@ function initializeUi() {
     }
   });
 
+  skipRealTaskButton.addEventListener('click', () => {
+    if (!appState.round.realTask.active || appState.stage === STAGES.SURVEY_BREAK) {
+      return;
+    }
+
+    const realTask = appState.round.realTask;
+    realTask.currentTrialIndex = realTask.totalTrialsPerCondition - 1;
+    appState.round.running = false;
+    appState.round.countdownActive = false;
+    clearComparisonMarkers();
+    advanceRealTaskFlow();
+  });
+
   lockRangeButton.addEventListener('click', () => {
     if (appState.stage !== STAGES.HEAD_INSTRUCTIONS || !appState.tracking.calibrated) return;
     const yawObserved = Math.max(HEAD_RANGE_LOCK_BUFFER.minYaw, appState.tracking.peakTurnObserved);
@@ -2525,6 +2613,23 @@ function initializeUi() {
   });
 
   proceedButton.addEventListener('click', () => {
+    if (appState.stage === STAGES.SURVEY_BREAK) {
+      const realTask = appState.round.realTask;
+      if (realTask.completed) {
+        setStage(STAGES.READY_FOR_REAL);
+      } else {
+        realTask.pendingSurveyCondition = null;
+        realTask.currentConditionOrderIndex = 1;
+        realTask.currentCondition = realTask.conditionOrder[1];
+        realTask.currentTrialIndex = 0;
+        loadRealTaskTargetsForCurrentTrial();
+        setConditionInstructionStage(realTask.currentCondition);
+        applyTargetSceneForCurrentCondition();
+        updateStatus(`Switched condition. Continue with ${formatConditionLabel(realTask.currentCondition)}.`);
+      }
+      return;
+    }
+
     if (appState.round.realTask.active) {
       clearComparisonMarkers();
       advanceRealTaskFlow();
@@ -2563,6 +2668,7 @@ function initializeUi() {
       beginRealTaskFlow();
       return;
     }
+
   });
 
 

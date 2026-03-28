@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informed Consent — Photo Replication Experiment</title>
+  <style>
+    :root {
+      --bg: #0f1612;
+      --card: rgba(20, 31, 24, 0.96);
+      --border: rgba(198, 222, 200, 0.28);
+      --text: #eef5ea;
+      --muted: #c7d5c9;
+      --accent: #9fc29f;
+      --err: #ff8a8a;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 14px;
+    }
+    .card {
+      width: min(760px, calc(100vw - 28px));
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.4);
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 26px;
+    }
+    .subtitle {
+      color: var(--accent);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: 16px;
+      color: var(--accent);
+      margin: 20px 0 6px;
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 4px 0;
+      font-size: 14px;
+    }
+    ul { padding-left: 20px; margin: 6px 0; }
+    .consent-items {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+    }
+    .check-row input[type="checkbox"] {
+      margin-top: 2px;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .check-row span { font-size: 14px; color: var(--text); line-height: 1.45; }
+    .sig-block {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .field label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 5px;
+      color: var(--text);
+    }
+    .field input {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .field input:focus { outline: 1px solid var(--accent); }
+    .id-display {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(159, 194, 159, 0.07);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .id-display strong { color: var(--accent); font-size: 16px; letter-spacing: 1px; }
+    .error-msg {
+      margin-top: 12px;
+      color: var(--err);
+      font-size: 14px;
+      min-height: 18px;
+    }
+    button {
+      margin-top: 16px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      background: linear-gradient(135deg, #5e7d55, #2a3a2a);
+      color: var(--text);
+      cursor: pointer;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    @media (max-width: 540px) {
+      .sig-block { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Informed Consent</h1>
+    <p class="subtitle">Photo Replication Experiment — 3D Camera Control Study</p>
+
+    <h2>Purpose</h2>
+    <p>
+      This study investigates how people use different camera control methods (mouse-only vs. head+mouse) to navigate a 3D scene during a block-repositioning task. Results will be used for academic research.
+    </p>
+
+    <h2>What You Will Do</h2>
+    <ul>
+      <li>Complete two blocks of 3D camera control tasks (~12 trials each)</li>
+      <li>Use your webcam for head-pose detection in one condition</li>
+      <li>Fill out brief questionnaires after each block and at the end</li>
+      <li>Total duration: approximately 45–50 minutes</li>
+    </ul>
+
+    <h2>Data Collection</h2>
+    <ul>
+      <li>Task performance data (completion time, placement accuracy)</li>
+      <li>Webcam-derived head pose estimates — <strong>no video is recorded or transmitted</strong></li>
+      <li>Survey responses (workload, usability, preference)</li>
+      <li>All data is stored locally and identified only by your participant ID</li>
+    </ul>
+
+    <h2>Your Rights</h2>
+    <ul>
+      <li>Participation is entirely voluntary</li>
+      <li>You may withdraw at any time without penalty by closing the browser</li>
+      <li>Data collected up to that point may be retained in anonymised form</li>
+    </ul>
+
+    <h2>Please confirm each of the following</h2>
+    <div class="consent-items">
+      <label class="check-row">
+        <input type="checkbox" id="c1" />
+        <span>I have read and understood the information above and agree to participate in this study.</span>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="c2" />
+        <span>I understand that my webcam will be used for real-time head-pose estimation and that no video footage is recorded or stored.</span>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="c3" />
+        <span>I understand that my performance and survey data will be collected and may be used in academic publications in anonymised form.</span>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="c4" />
+        <span>I am 18 years of age or older.</span>
+      </label>
+    </div>
+
+    <div class="sig-block">
+      <div class="field">
+        <label for="sig-name">Full name (typed signature)</label>
+        <input type="text" id="sig-name" placeholder="Your full name" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="sig-date">Date</label>
+        <input type="text" id="sig-date" readonly />
+      </div>
+    </div>
+
+    <div class="id-display">
+      Your assigned participant ID: <strong id="pid-display">—</strong>
+      <br /><span style="font-size:12px;">This ID will be attached to your data files. Please note it down if you need to withdraw your data later.</span>
+    </div>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <button id="begin-btn" type="button">I Agree &amp; Begin the Study</button>
+  </main>
+
+  <script>
+    function generateParticipantId() {
+      const now = new Date();
+      const date = now.toISOString().slice(0, 10).replace(/-/g, '');
+      const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+      return `P-${date}-${rand}`;
+    }
+
+    const participantId = generateParticipantId();
+    document.getElementById('pid-display').textContent = participantId;
+
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+    document.getElementById('sig-date').value = today;
+
+    document.getElementById('begin-btn').addEventListener('click', () => {
+      const allChecked = ['c1', 'c2', 'c3', 'c4'].every((id) => document.getElementById(id).checked);
+      const name = document.getElementById('sig-name').value.trim();
+      const errEl = document.getElementById('error-msg');
+
+      if (!allChecked) {
+        errEl.textContent = 'Please tick all consent checkboxes before continuing.';
+        return;
+      }
+      if (!name) {
+        errEl.textContent = 'Please enter your full name as a typed signature.';
+        return;
+      }
+
+      errEl.textContent = '';
+
+      sessionStorage.setItem('participantId', participantId);
+      sessionStorage.setItem('consentGiven', 'true');
+      sessionStorage.setItem('consentSignature', name);
+      sessionStorage.setItem('consentTimestamp', new Date().toISOString());
+
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

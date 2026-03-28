@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photo Replication Experiment</title>
+    <script>
+      if (sessionStorage.getItem('consentGiven') !== 'true') {
+        window.location.replace('consent.html');
+      }
+    </script>
     <style>
         :root {
             --panel-bg: rgba(16, 24, 20, 0.82);
@@ -125,6 +130,25 @@
         button:disabled {
             opacity: 0.55;
             cursor: default;
+        }
+
+        #survey-link-button,
+        #final-survey-link-button {
+            cursor: pointer;
+            background: linear-gradient(135deg, #4d6270, #1e2d36);
+            min-width: 150px;
+            border: 1px solid rgba(104, 211, 255, 0.35);
+            border-radius: 10px;
+            color: var(--text-main);
+            padding: 10px 14px;
+            font: inherit;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        #survey-link-button:hover,
+        #final-survey-link-button:hover {
+            border-color: rgba(104, 211, 255, 0.7);
         }
 
         #reference-panel {
@@ -281,6 +305,23 @@
             z-index: 44;
         }
 
+        #trial-counter {
+            position: fixed;
+            top: 82px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(10, 20, 16, 0.70);
+            border: 1px solid rgba(104, 211, 255, 0.22);
+            border-radius: 8px;
+            padding: 3px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #a8d8f0;
+            z-index: 44;
+            display: none;
+        }
+
         #hidden-config {
             position: fixed;
             width: 1px;
@@ -357,10 +398,27 @@
         <button id="stage-button" type="button">I Understand</button>
         <button id="lock-range-button" type="button" style="display:none">Lock Range</button>
         <button id="retry-practice-button" type="button">Retry</button>
+        <a id="survey-link-button" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Open Survey</a>
+        <a id="final-survey-link-button" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Open Final Survey</a>
         <button id="proceed-button" type="button">Continue</button>
     </div>
 
     <button id="skip-practice-button" type="button">Skip Practice</button>
+
+    <button id="skip-real-task-button" type="button" style="
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 100;
+        background: linear-gradient(135deg, #b36b6b, #7a2d2d);
+        color: #fff;
+        opacity: 0.85;
+        font-weight: bold;
+        border: 2px solid #fff2;
+        border-radius: 10px;
+        padding: 10px 18px;
+        display: none;
+    ">Skip to Survey (dev)</button>
 
     <aside id="reference-panel" class="panel">
         <p class="eyebrow">Reference Panel</p>
@@ -373,6 +431,7 @@
     </aside>
 
     <div id="timer-readout">90.0s</div>
+    <div id="trial-counter"></div>
 
     <div id="hidden-readouts" style="display:none;">
         <span id="condition-readout"></span>
