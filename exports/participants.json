@@ -1,0 +1,3697 @@
+{
+  "projectId": "experiment-fb083",
+  "collection": "participants",
+  "exportedAtIso": "2026-04-01T08:20:29.095Z",
+  "documentCount": 17,
+  "documents": [
+    {
+      "id": "P-20260328-1A6R",
+      "consent": {
+        "participantId": "P-20260328-1A6R",
+        "signature": "Yutong Liu",
+        "timestamp": "2026-03-28T16:46:59.187Z"
+      },
+      "trials_head_mouse": [],
+      "trials_mouse_only": [],
+      "survey_final": {
+        "overallPreference": null,
+        "preferenceReason": null,
+        "comparisonsComplete": false,
+        "likedMouseOnly": null,
+        "background3d": {
+          "hoursPerWeek": null,
+          "tools": null
+        },
+        "comparisons": {
+          "efficiency": null,
+          "fatigue": null,
+          "confidence": null,
+          "precision": null,
+          "control": null,
+          "learnability": null,
+          "spatialClarity": 3,
+          "intuitive": null,
+          "comfort": null
+        },
+        "likedHeadMouse": null,
+        "timestampIso": "2026-03-28T16:47:31.343Z",
+        "improvements": null
+      }
+    },
+    {
+      "id": "P-20260328-DC39",
+      "consent": {
+        "participantId": "P-20260328-DC39",
+        "signature": "Yutong Liu",
+        "timestamp": "2026-03-28T10:34:16.845Z"
+      },
+      "trials_head_mouse": [],
+      "survey_mouse_only": {
+        "condition": "mouse-only",
+        "comments": "Ah",
+        "usability": {
+          "score": 56.3,
+          "itemResponses": [
+            2,
+            3,
+            3,
+            3,
+            4,
+            3,
+            4,
+            4
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-28T10:51:02.414Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 60,
+            "frustration": 50,
+            "effort": 40,
+            "mental": 70,
+            "physical": 25,
+            "temporal": 70
+          },
+          "rawScore": 52.5
+        }
+      },
+      "survey_final": {
+        "overallPreference": "mouse-only",
+        "preferenceReason": "No!",
+        "comparisonsComplete": true,
+        "likedMouseOnly": null,
+        "background3d": {
+          "hoursPerWeek": "0",
+          "tools": null
+        },
+        "comparisons": {
+          "efficiency": 2,
+          "fatigue": 2,
+          "confidence": 2,
+          "precision": 2,
+          "control": 2,
+          "learnability": 2,
+          "intuitive": 2,
+          "comfort": 2
+        },
+        "likedHeadMouse": null,
+        "timestampIso": "2026-03-28T10:51:24.126Z",
+        "improvements": "Yes"
+      },
+      "trials_mouse_only": [
+        {
+          "participantId": "P-20260328-DC39",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 11576.800000011921,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 6
+        }
+      ]
+    },
+    {
+      "id": "P-20260328-RT69",
+      "consent": {
+        "participantId": "P-20260328-RT69",
+        "signature": "Yutong Liu",
+        "timestamp": "2026-03-28T10:31:37.040Z"
+      }
+    },
+    {
+      "id": "P-20260328-UPKM",
+      "consent": {
+        "participantId": "P-20260328-UPKM",
+        "signature": "YL",
+        "timestamp": "2026-03-28T16:34:59.932Z"
+      },
+      "trials_head_mouse": [],
+      "trials_mouse_only": []
+    },
+    {
+      "id": "P-20260329-KA7W",
+      "consent": {
+        "participantId": "P-20260329-KA7W",
+        "signature": "Cyril Zhang",
+        "timestamp": "2026-03-29T02:19:28.957Z"
+      },
+      "trials_mouse_only": [
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 31038,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            1,
+            1,
+            2,
+            3
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 1,
+          "reason": "structure-complete",
+          "elapsedMs": 20581,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            2
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 13698,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 44270,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            5,
+            4,
+            3,
+            4,
+            3
+          ],
+          "totalRepositions": 19
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 23542,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            3,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 16406,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            2,
+            2
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 35841,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            3,
+            3,
+            1
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 48298,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            2,
+            2
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 23583,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 41162,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 25516,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 17927,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 7
+        }
+      ],
+      "survey_mouse_only": {
+        "condition": "mouse-only",
+        "comments": null,
+        "usability": {
+          "score": 100,
+          "itemResponses": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-29T02:32:06.136Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 5,
+            "frustration": 10,
+            "effort": 40,
+            "mental": 25,
+            "physical": 15,
+            "temporal": 15
+          },
+          "rawScore": 18.33
+        }
+      },
+      "trials_head_mouse": [
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 24063,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            4,
+            1,
+            1,
+            1,
+            3
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 1,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 1,
+          "hiddenTotalCount": 5,
+          "positionError": 4,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            2,
+            3
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 46031,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            3,
+            2,
+            2,
+            2
+          ],
+          "totalRepositions": 12
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 22982,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            1,
+            2
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 19088,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 51379,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            3,
+            4,
+            2,
+            1
+          ],
+          "totalRepositions": 12
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 18554,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "totalRepositions": 4
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 18274,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 32559,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 62917,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            2,
+            2
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 24783,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260329-KA7W",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 29371,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            1,
+            2,
+            2
+          ],
+          "totalRepositions": 9
+        }
+      ],
+      "survey_head_mouse": {
+        "condition": "head-mouse",
+        "comments": "It made me feel dizzy/nauseous",
+        "usability": {
+          "score": 50,
+          "itemResponses": [
+            5,
+            5,
+            2,
+            1,
+            3,
+            3,
+            2,
+            3
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-29T02:46:55.411Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 20,
+            "frustration": 55,
+            "effort": 65,
+            "mental": 40,
+            "physical": 45,
+            "temporal": 45
+          },
+          "rawScore": 45
+        }
+      },
+      "survey_final": {
+        "overallPreference": "mouse-only",
+        "preferenceReason": "Dizziness when using the head+mouse method",
+        "comparisonsComplete": true,
+        "likedMouseOnly": "It was more precious",
+        "background3d": {
+          "hoursPerWeek": "lt1",
+          "tools": "Unity"
+        },
+        "comparisons": {
+          "efficiency": 2,
+          "fatigue": 2,
+          "confidence": 1,
+          "precision": 1,
+          "control": 1,
+          "learnability": 3,
+          "spatialClarity": 2,
+          "intuitive": 3,
+          "comfort": 3
+        },
+        "likedHeadMouse": "Less fatiguing for the hands",
+        "timestampIso": "2026-03-29T02:48:22.752Z",
+        "improvements": "If the head+mouse method had less drifting, it would be easier to use and less nauseating"
+      }
+    },
+    {
+      "id": "P-20260330-PFBZ",
+      "consent": {
+        "participantId": "P-20260330-PFBZ",
+        "signature": "Corina",
+        "timestamp": "2026-03-30T21:03:05.505Z"
+      },
+      "trials_head_mouse": [
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 46567,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            2,
+            3,
+            2,
+            2
+          ],
+          "totalRepositions": 12
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 1,
+          "reason": "structure-complete",
+          "elapsedMs": 70600,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            1,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 2,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            2,
+            2,
+            2,
+            2,
+            3
+          ],
+          "totalRepositions": 11
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 3,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 4,
+          "hiddenTotalCount": 5,
+          "positionError": 1,
+          "repositionCounts": [
+            2,
+            1,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 4,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            4,
+            2,
+            4,
+            4,
+            2
+          ],
+          "totalRepositions": 16
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 39666,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 6,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 2,
+          "hiddenTotalCount": 5,
+          "positionError": 3,
+          "repositionCounts": [
+            5,
+            2,
+            5,
+            3,
+            3
+          ],
+          "totalRepositions": 18
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 7,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 4,
+          "hiddenTotalCount": 5,
+          "positionError": 1,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            2,
+            3
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 26331,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 16871,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 20634,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "totalRepositions": 4
+        },
+        {
+          "participantId": "P-20260330-PFBZ",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 56066,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 7
+        }
+      ],
+      "survey_head_mouse": {
+        "condition": "head-mouse",
+        "comments": null,
+        "usability": {
+          "score": 56.3,
+          "itemResponses": [
+            4,
+            4,
+            3,
+            3,
+            3,
+            3,
+            4,
+            2
+          ],
+          "complete": true
+        },
+        "nasaTlx": {
+          "ratings": {
+            "performance": 40,
+            "frustration": 25,
+            "effort": 50,
+            "mental": 65,
+            "physical": 20,
+            "temporal": 50
+          },
+          "rawScore": 41.67
+        },
+        "timestampIso": "2026-03-30T21:41:18.778Z"
+      }
+    },
+    {
+      "id": "P-20260331-1J1P",
+      "consent": {
+        "participantId": "P-20260331-1J1P",
+        "signature": "Jingyu WU",
+        "timestamp": "2026-03-31T05:26:27.160Z"
+      }
+    },
+    {
+      "id": "P-20260331-3VRL",
+      "consent": {
+        "participantId": "P-20260331-3VRL",
+        "signature": "Yutong Liu",
+        "timestamp": "2026-03-31T06:29:06.709Z"
+      },
+      "trials_head_mouse": [
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 12969,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 1,
+          "reason": "structure-complete",
+          "elapsedMs": 15884,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            2,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 19391,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            3,
+            2,
+            1
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 57060,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            2,
+            3,
+            3,
+            1
+          ],
+          "totalRepositions": 12
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 10557,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            2,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 26182,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            5,
+            2,
+            3,
+            4
+          ],
+          "totalRepositions": 16
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 11822,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 37710,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            3,
+            6,
+            3,
+            3
+          ],
+          "totalRepositions": 18
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 35295,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            5,
+            3,
+            2,
+            1
+          ],
+          "totalRepositions": 13
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 12062,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            0,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 14750,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            3,
+            3,
+            1
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 24584,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            4,
+            3,
+            2
+          ],
+          "totalRepositions": 13
+        }
+      ],
+      "survey_head_mouse": {
+        "condition": "head-mouse",
+        "comments": null,
+        "usability": {
+          "score": 56.3,
+          "itemResponses": [
+            4,
+            5,
+            4,
+            2,
+            3,
+            2,
+            4,
+            2
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T06:41:50.501Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 0,
+            "frustration": 35,
+            "effort": 60,
+            "mental": 40,
+            "physical": 40,
+            "temporal": 40
+          },
+          "rawScore": 35.83
+        }
+      },
+      "trials_mouse_only": [
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 12907,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 1,
+          "reason": "structure-complete",
+          "elapsedMs": 19643,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            3,
+            4,
+            2,
+            3
+          ],
+          "totalRepositions": 12
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 13586,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            1,
+            2,
+            3,
+            2
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 9885,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            2,
+            0
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 10127,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            3,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 12895,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            0,
+            2,
+            4,
+            1
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 13569,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            3,
+            0
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 12483,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 11050,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            2,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 14472,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            0,
+            2,
+            3,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 59114,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            4,
+            1,
+            2,
+            3,
+            7
+          ],
+          "totalRepositions": 17
+        },
+        {
+          "participantId": "P-20260331-3VRL",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 18739,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            3,
+            2
+          ],
+          "totalRepositions": 10
+        }
+      ],
+      "survey_mouse_only": {
+        "condition": "mouse-only",
+        "comments": null,
+        "usability": {
+          "score": 84.4,
+          "itemResponses": [
+            5,
+            5,
+            5,
+            4,
+            5,
+            4,
+            4,
+            3
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T06:47:35.451Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 0,
+            "frustration": 55,
+            "effort": 50,
+            "mental": 60,
+            "physical": 50,
+            "temporal": 40
+          },
+          "rawScore": 42.5
+        }
+      },
+      "survey_final": {
+        "overallPreference": "head-mouse",
+        "preferenceReason": "I feel that the head movement somewhat allows me to feel the scene to be more 3D. And it decreases the feeling of repetiveness.",
+        "comparisonsComplete": true,
+        "likedMouseOnly": "Precision and accuracy.",
+        "background3d": {
+          "hoursPerWeek": "1-5",
+          "tools": "Unity, Unreal Engine"
+        },
+        "comparisons": {
+          "efficiency": 2,
+          "fatigue": 3,
+          "confidence": 2,
+          "precision": 1,
+          "control": 2,
+          "learnability": 2,
+          "spatialClarity": 4,
+          "intuitive": 2,
+          "comfort": 2
+        },
+        "likedHeadMouse": "It feels fun and feels more 3D.",
+        "timestampIso": "2026-03-31T06:50:44.783Z",
+        "improvements": null
+      }
+    },
+    {
+      "id": "P-20260331-7JB9",
+      "consent": {
+        "participantId": "P-20260331-7JB9",
+        "signature": "Yilan Tao",
+        "timestamp": "2026-03-31T05:34:02.192Z"
+      },
+      "trials_head_mouse": [
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 86532,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            4,
+            5,
+            3,
+            4,
+            6
+          ],
+          "totalRepositions": 22
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 1,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            3,
+            4,
+            2,
+            3,
+            4
+          ],
+          "totalRepositions": 16
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 2,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 4,
+          "hiddenTotalCount": 5,
+          "positionError": 1,
+          "repositionCounts": [
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 43151,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            3,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 27041,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            1,
+            1,
+            3,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 19461,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 38294,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            3,
+            3,
+            1,
+            7
+          ],
+          "totalRepositions": 16
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 21642,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 4
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 17832,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 27874,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            3,
+            1,
+            2
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 20389,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            1,
+            2
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-7JB9",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 21950,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        }
+      ],
+      "trials_mouse_only": [],
+      "survey_mouse_only": {
+        "condition": "mouse-only",
+        "comments": null,
+        "usability": {
+          "score": 100,
+          "itemResponses": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T05:46:12.136Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 15,
+            "frustration": 30,
+            "effort": 30,
+            "mental": 35,
+            "physical": 35,
+            "temporal": 15
+          },
+          "rawScore": 26.67
+        }
+      },
+      "survey_final": {
+        "overallPreference": "mouse-only",
+        "preferenceReason": "it is too hard to control the movement with the head. I alway rotate over. And it is hard to tell what is triggered and what is not, when you turn head to one side it rotates this is good, and then you have to turn your head back, and it rotates back! Even if I am turning my head slowly it still senses my turning. So I cannot really rotate the 3D platform because basically it is just moveing back and forth with my head.",
+        "comparisonsComplete": true,
+        "likedMouseOnly": "very precise, effertless",
+        "background3d": {
+          "hoursPerWeek": "10+",
+          "tools": "Unity, Blender, Sketchup, Rhino, Maya"
+        },
+        "comparisons": {
+          "efficiency": 1,
+          "fatigue": 1,
+          "confidence": 1,
+          "precision": 1,
+          "control": 1,
+          "learnability": 1,
+          "spatialClarity": 4,
+          "intuitive": 3,
+          "comfort": 1
+        },
+        "likedHeadMouse": "give some exercise to my head and neck",
+        "timestampIso": "2026-03-31T05:54:39.993Z",
+        "improvements": "Mouse is acrtually only rotating the view when (right clicked & moved), so when (!right clicked & moved) the view don't rotate, and your hand can move back. The head is rotating the view when (head turns), and there is not another confirmation to do the & calculation, so whenever the head turns the view turns, but our head and neck cannot twist more than 60 degree so the view basically is hard to change the view, cause you always need to turn back the head and the view rotates back following your head ..."
+      }
+    },
+    {
+      "id": "P-20260331-8RCT",
+      "consent": {
+        "participantId": "P-20260331-8RCT",
+        "signature": "Xinyi Maggie Hao",
+        "timestamp": "2026-03-31T07:42:19.048Z"
+      },
+      "trials_mouse_only": [
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 0,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            2,
+            1,
+            1,
+            2,
+            0
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 1,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 1,
+          "hiddenTotalCount": 5,
+          "positionError": 4,
+          "repositionCounts": [
+            1,
+            3,
+            3,
+            1,
+            0
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 33553,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 4
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 30432,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 29605,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            2,
+            2,
+            0
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 49597,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 6,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            2,
+            3,
+            3,
+            5,
+            1
+          ],
+          "totalRepositions": 14
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 88633,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 29333,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 4
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 9,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            3,
+            4,
+            4,
+            4,
+            4
+          ],
+          "totalRepositions": 19
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 38762,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            2,
+            0
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 41263,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            4,
+            1,
+            1
+          ],
+          "totalRepositions": 9
+        }
+      ],
+      "trials_head_mouse": [
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 0,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 4,
+          "hiddenTotalCount": 5,
+          "positionError": 1,
+          "repositionCounts": [
+            1,
+            2,
+            3,
+            3,
+            2
+          ],
+          "totalRepositions": 11
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 1,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 4,
+          "hiddenTotalCount": 5,
+          "positionError": 1,
+          "repositionCounts": [
+            2,
+            2,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 45738,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            1,
+            2,
+            2,
+            2
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 53804,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 30413,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            2,
+            2,
+            0
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 49596,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            1,
+            1,
+            4
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 41596,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 7,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            1,
+            6,
+            8,
+            2,
+            1
+          ],
+          "totalRepositions": 18
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 33413,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 9,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 4,
+          "hiddenTotalCount": 5,
+          "positionError": 1,
+          "repositionCounts": [
+            2,
+            4,
+            1,
+            3,
+            3
+          ],
+          "totalRepositions": 13
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 87047,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            6,
+            1,
+            1,
+            1,
+            2
+          ],
+          "totalRepositions": 11
+        },
+        {
+          "participantId": "P-20260331-8RCT",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 28487,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            1,
+            1,
+            2
+          ],
+          "totalRepositions": 7
+        }
+      ],
+      "survey_final": {
+        "overallPreference": "mouse-only",
+        "preferenceReason": "The head method is like a tortue tool especially for someone with astigmatism, since we tend to move or look at the screen from an increasing large angle as we look at the screen longer. This head motion detector thing is so sensitive that it detects these angle changes which I don't notice in my everyday life and my neck hurts now.",
+        "comparisonsComplete": true,
+        "likedMouseOnly": "Because my head or my neck doesn't need to maintain certain angle to do the tasks and also I'm kind of used to use mouse. Also for turning the plate(like when you finish positioning the blocks from one side and need to turn the plate and do the other side), it's easier with the mouse since you only need to use the right-click. But with the head motion thing, sometimes I turn the plate too much and it needs to be turn the other clockwise again. This makes me feel that my head is acting like a electric fan.",
+        "background3d": {
+          "hoursPerWeek": "lt1",
+          "tools": "I don't use the 3D softwares mentioned above but I do play some 3D games on my laptop for long hours daily so it may count(?) Like Wherewind Meets this year, trust me its 3D is crazy but still better than your head motion detector."
+        },
+        "comparisons": {
+          "efficiency": 1,
+          "fatigue": 1,
+          "confidence": 1,
+          "precision": 1,
+          "control": 1,
+          "learnability": 2,
+          "spatialClarity": 2,
+          "intuitive": 3,
+          "comfort": 1
+        },
+        "likedHeadMouse": "I don't like it.",
+        "improvements": "Can you make the head motion detector thing less sensitive? like for a small angle change, it doesn't rotate the plate that much. Or can you make an option, for example at the begining, ask the users to decide a minor head angle change makes how much difference in terms of the plate on the computer screen(for example, extents can be: SLIGHT, NORMAL, A LOT). It may help.",
+        "timestampIso": "2026-03-31T08:27:40.945Z"
+      }
+    },
+    {
+      "id": "P-20260331-9PFK",
+      "consent": {
+        "participantId": "P-20260331-9PFK",
+        "signature": "Yilan Tao",
+        "timestamp": "2026-03-31T05:23:18.898Z"
+      }
+    },
+    {
+      "id": "P-20260331-G0E7",
+      "consent": {
+        "participantId": "P-20260331-G0E7",
+        "signature": "YL",
+        "timestamp": "2026-03-31T08:30:40.059Z"
+      },
+      "trials_head_mouse": [],
+      "trials_mouse_only": [],
+      "survey_head_mouse": {
+        "condition": "head-mouse",
+        "comments": "tbh if you can make the head motion sensor not that sensitive, for example a minor head motion changes don't make a big difference on the screen, the experience might be improved significantly. Also for the frustration and mental stress part, I don't blame the camera method entirely since I have already been doubting and questioning myself in terms of capability without the camera thing in my life already. So the high stress level is true but the reasons might be mixed, largely due to my low self-esteem and partly due to this oversensitive camera thing.",
+        "usability": {
+          "score": 34.4,
+          "itemResponses": [
+            3,
+            3,
+            5,
+            1,
+            2,
+            2,
+            1,
+            2
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T08:40:17.584Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 95,
+            "frustration": 95,
+            "effort": 90,
+            "mental": 70,
+            "physical": 70,
+            "temporal": 40
+          },
+          "rawScore": 76.67
+        }
+      },
+      "survey_mouse_only": {
+        "condition": "mouse-only",
+        "comments": "In terms of the experience, the mouse one feels much better than the head one. Can we just stay with mouse/keyboard or gamepad for future technology improvement? Thank you XOXO",
+        "usability": {
+          "score": 81.3,
+          "itemResponses": [
+            4,
+            4,
+            5,
+            5,
+            5,
+            4,
+            3,
+            4
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T08:44:17.701Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 85,
+            "frustration": 75,
+            "effort": 80,
+            "mental": 25,
+            "physical": 15,
+            "temporal": 25
+          },
+          "rawScore": 50.83
+        }
+      }
+    },
+    {
+      "id": "P-20260331-L47A",
+      "consent": {
+        "participantId": "P-20260331-L47A",
+        "signature": "Jingyu WU",
+        "timestamp": "2026-03-31T05:09:52.906Z"
+      },
+      "trials_head_mouse": [],
+      "survey_head_mouse": {
+        "condition": "head-mouse",
+        "comments": null,
+        "usability": {
+          "score": null,
+          "itemResponses": [
+            4,
+            null,
+            3,
+            2,
+            2,
+            2,
+            2,
+            3
+          ],
+          "complete": false
+        },
+        "timestampIso": "2026-03-31T05:20:22.322Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 70,
+            "frustration": 65,
+            "effort": 75,
+            "mental": 65,
+            "physical": 50,
+            "temporal": 65
+          },
+          "rawScore": 65
+        }
+      }
+    },
+    {
+      "id": "P-20260331-R46C",
+      "consent": {
+        "participantId": "P-20260331-R46C",
+        "signature": "Yumeng Zhuang",
+        "timestamp": "2026-03-31T01:28:18.800Z"
+      },
+      "trials_mouse_only": [
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 35461,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 1,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 0,
+          "hiddenTotalCount": 5,
+          "positionError": 5,
+          "repositionCounts": [
+            1,
+            2,
+            4,
+            1,
+            1
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 64860,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            3,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 45121,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 31189,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            2,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 41691,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            1,
+            1,
+            1,
+            3
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 68671,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 38176,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            1,
+            0
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 24217,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "totalRepositions": 4
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 63079,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            3,
+            2,
+            5,
+            2
+          ],
+          "totalRepositions": 13
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 37702,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 27794,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        }
+      ],
+      "survey_mouse_only": {
+        "condition": "mouse-only",
+        "comments": null,
+        "usability": {
+          "score": 87.5,
+          "itemResponses": [
+            4,
+            5,
+            5,
+            4,
+            5,
+            5,
+            4,
+            4
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T01:46:38.029Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 40,
+            "frustration": 60,
+            "effort": 70,
+            "mental": 70,
+            "physical": 50,
+            "temporal": 65
+          },
+          "rawScore": 59.17
+        }
+      },
+      "trials_head_mouse": [
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 46481,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            2,
+            2,
+            1,
+            3
+          ],
+          "totalRepositions": 11
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 1,
+          "reason": "structure-complete",
+          "elapsedMs": 45697,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 29363,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 43089,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 4,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 0,
+          "hiddenTotalCount": 5,
+          "positionError": 5,
+          "repositionCounts": [
+            4,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 46482,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            3,
+            3,
+            1,
+            3
+          ],
+          "totalRepositions": 13
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 28725,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 23071,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            1,
+            1,
+            0
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 23272,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            1,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 56337,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            1,
+            2,
+            3
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 40531,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-R46C",
+          "mode": "structure-build",
+          "stage": "head-running",
+          "condition": "head-mouse",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 30579,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            2,
+            4,
+            1
+          ],
+          "totalRepositions": 11
+        }
+      ],
+      "survey_head_mouse": {
+        "condition": "head-mouse",
+        "comments": "I feel like this control method is helpful for situations when you want to move your neck a bit, preventing it from getting stiff in long hours of 3D work.",
+        "usability": {
+          "score": 43.8,
+          "itemResponses": [
+            2,
+            3,
+            2,
+            2,
+            4,
+            4,
+            2,
+            3
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T01:59:34.373Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 60,
+            "frustration": 60,
+            "effort": 65,
+            "mental": 75,
+            "physical": 60,
+            "temporal": 65
+          },
+          "rawScore": 64.17
+        }
+      },
+      "survey_final": {
+        "overallPreference": "mouse-only",
+        "preferenceReason": "I'm familiar with mouse-only controls and I can feel less tethered to the virtual space with only mouse clicks (meaning I can move my head whenever I want and will not feel tied to the screen).",
+        "comparisonsComplete": true,
+        "likedMouseOnly": "It is precise and it stays where I leave it to be.",
+        "background3d": {
+          "hoursPerWeek": "lt1",
+          "tools": "Blender, Fusion360"
+        },
+        "comparisons": {
+          "efficiency": 2,
+          "fatigue": 3,
+          "confidence": 2,
+          "precision": 1,
+          "control": 1,
+          "learnability": 3,
+          "spatialClarity": 4,
+          "intuitive": 2,
+          "comfort": 3
+        },
+        "likedHeadMouse": "It is fluid and helps me move my neck to prevent stiffness and feels more playful.",
+        "timestampIso": "2026-03-31T02:04:37.010Z",
+        "improvements": "Since the mouse only triggers movement when clicked and dragged, I wonder if the head can only \"drag\" the build plane with certain gestures. To prevent the constant floating and turning of the view when I don't intend to change it."
+      }
+    },
+    {
+      "id": "P-20260331-UJX2",
+      "consent": {
+        "participantId": "P-20260331-UJX2",
+        "signature": "corina",
+        "timestamp": "2026-03-31T18:15:13.501Z"
+      },
+      "trials_mouse_only": [
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 24833,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 1,
+          "reason": "structure-complete",
+          "elapsedMs": 25966,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            2,
+            1,
+            1,
+            2
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 31466,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            3,
+            2
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 56600,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            4,
+            3,
+            1,
+            1,
+            8
+          ],
+          "totalRepositions": 17
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 49269,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            3,
+            2,
+            2,
+            2
+          ],
+          "totalRepositions": 11
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 5,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            1,
+            2,
+            1,
+            2,
+            9
+          ],
+          "totalRepositions": 15
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 44131,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 8
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 7,
+          "reason": "timeout",
+          "elapsedMs": 90000,
+          "hiddenFoundCount": 3,
+          "hiddenTotalCount": 5,
+          "positionError": 2,
+          "repositionCounts": [
+            6,
+            4,
+            4,
+            4,
+            1
+          ],
+          "totalRepositions": 19
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 30700,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            3,
+            2,
+            2,
+            2
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 20766,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            1,
+            1,
+            0
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 17599,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "totalRepositions": 5
+        },
+        {
+          "participantId": "P-20260331-UJX2",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 20865,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            2,
+            1
+          ],
+          "totalRepositions": 7
+        }
+      ],
+      "survey_mouse_only": {
+        "condition": "mouse-only",
+        "comments": "mouse only",
+        "usability": {
+          "score": 78.1,
+          "itemResponses": [
+            5,
+            5,
+            3,
+            3,
+            4,
+            3,
+            5,
+            5
+          ],
+          "complete": true
+        },
+        "nasaTlx": {
+          "ratings": {
+            "performance": 65,
+            "frustration": 25,
+            "effort": 30,
+            "mental": 25,
+            "physical": 25,
+            "temporal": 25
+          },
+          "rawScore": 32.5
+        },
+        "timestampIso": "2026-03-31T18:28:41.566Z"
+      }
+    },
+    {
+      "id": "P-20260331-XD80",
+      "consent": {
+        "participantId": "P-20260331-XD80",
+        "signature": "Yutong Liu",
+        "timestamp": "2026-03-31T05:56:09.704Z"
+      },
+      "trials_head_mouse": [],
+      "survey_head_mouse": {
+        "condition": "head-mouse",
+        "comments": "Too hard to control!",
+        "usability": {
+          "score": 9.4,
+          "itemResponses": [
+            3,
+            1,
+            1,
+            1,
+            2,
+            1,
+            1,
+            1
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T06:01:51.002Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 80,
+            "frustration": 90,
+            "effort": 100,
+            "mental": 95,
+            "physical": 80,
+            "temporal": 55
+          },
+          "rawScore": 83.33
+        }
+      }
+    },
+    {
+      "id": "P-20260331-ZHVR",
+      "consent": {
+        "participantId": "P-20260331-ZHVR",
+        "signature": "Yilan Tao",
+        "timestamp": "2026-03-31T20:15:32.615Z"
+      },
+      "trials_mouse_only": [
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 0,
+          "reason": "structure-complete",
+          "elapsedMs": 55666,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            4,
+            2,
+            2
+          ],
+          "totalRepositions": 11
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 1,
+          "reason": "structure-complete",
+          "elapsedMs": 36185,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 2,
+          "reason": "structure-complete",
+          "elapsedMs": 31102,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            4,
+            2,
+            1,
+            1,
+            2
+          ],
+          "totalRepositions": 10
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 3,
+          "reason": "structure-complete",
+          "elapsedMs": 25227,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 4,
+          "reason": "structure-complete",
+          "elapsedMs": 62058,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            5,
+            2,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 12
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 5,
+          "reason": "structure-complete",
+          "elapsedMs": 27566,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            2,
+            2,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 6,
+          "reason": "structure-complete",
+          "elapsedMs": 35992,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            2,
+            2
+          ],
+          "totalRepositions": 9
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 7,
+          "reason": "structure-complete",
+          "elapsedMs": 23160,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            2,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 8,
+          "reason": "structure-complete",
+          "elapsedMs": 22218,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 9,
+          "reason": "structure-complete",
+          "elapsedMs": 19969,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            0,
+            2,
+            2,
+            1,
+            2
+          ],
+          "totalRepositions": 7
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 10,
+          "reason": "structure-complete",
+          "elapsedMs": 25884,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "totalRepositions": 6
+        },
+        {
+          "participantId": "P-20260331-ZHVR",
+          "mode": "structure-build",
+          "stage": "mouse-running",
+          "condition": "mouse-only",
+          "trialIndex": 11,
+          "reason": "structure-complete",
+          "elapsedMs": 24015,
+          "hiddenFoundCount": 5,
+          "hiddenTotalCount": 5,
+          "positionError": 0,
+          "repositionCounts": [
+            3,
+            2,
+            1,
+            2,
+            1
+          ],
+          "totalRepositions": 9
+        }
+      ],
+      "survey_mouse_only": {
+        "condition": "mouse-only",
+        "comments": null,
+        "usability": {
+          "score": 100,
+          "itemResponses": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ],
+          "complete": true
+        },
+        "timestampIso": "2026-03-31T20:23:49.471Z",
+        "nasaTlx": {
+          "ratings": {
+            "performance": 0,
+            "frustration": 0,
+            "effort": 0,
+            "mental": 0,
+            "physical": 0,
+            "temporal": 0
+          },
+          "rawScore": 0
+        }
+      }
+    }
+  ]
+}

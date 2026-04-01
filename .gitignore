@@ -5,8 +5,5 @@ node_modules/
 service-account*.json
 *serviceAccount*.json
 
-# Local exports
-exports/
-
 # OS/editor
 .DS_Store
