@@ -154,6 +154,42 @@ function flattenSurveys(documents) {
   return rows;
 }
 
+function flattenConsentVisits(documents) {
+  const rows = [];
+  for (const doc of documents) {
+    const participantId = doc.id || doc.participantId || doc?.consent?.participantId || '';
+    const consent = doc?.consent && typeof doc.consent === 'object' ? doc.consent : {};
+
+    const trialsMouseOnly = Array.isArray(doc?.trials_mouse_only) ? doc.trials_mouse_only : [];
+    const trialsHeadMouse = Array.isArray(doc?.trials_head_mouse) ? doc.trials_head_mouse : [];
+
+    const surveyMouseOnly = doc?.survey_mouse_only && typeof doc.survey_mouse_only === 'object' ? doc.survey_mouse_only : null;
+    const surveyHeadMouse = doc?.survey_head_mouse && typeof doc.survey_head_mouse === 'object' ? doc.survey_head_mouse : null;
+    const surveyFinal = doc?.survey_final && typeof doc.survey_final === 'object' ? doc.survey_final : null;
+
+    rows.push({
+      participantId,
+      visitId: doc.id || '',
+      consentParticipantId: consent.participantId || '',
+      consentTimestampIso: consent.timestamp || '',
+      consentSignature: consent.signature || '',
+      hasConsent: Object.keys(consent).length > 0,
+      trialsMouseOnlyCount: trialsMouseOnly.length,
+      trialsHeadMouseCount: trialsHeadMouse.length,
+      totalTrialsCount: trialsMouseOnly.length + trialsHeadMouse.length,
+      hasSurveyMouseOnly: Boolean(surveyMouseOnly),
+      surveyMouseOnlyTimestampIso: surveyMouseOnly?.timestampIso || '',
+      hasSurveyHeadMouse: Boolean(surveyHeadMouse),
+      surveyHeadMouseTimestampIso: surveyHeadMouse?.timestampIso || '',
+      hasSurveyFinal: Boolean(surveyFinal),
+      surveyFinalTimestampIso: surveyFinal?.timestampIso || '',
+      completedBothConditions: trialsMouseOnly.length > 0 && trialsHeadMouse.length > 0,
+      completedAllSurveys: Boolean(surveyMouseOnly && surveyHeadMouse && surveyFinal)
+    });
+  }
+  return rows;
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help || args.h) {
@@ -164,6 +200,7 @@ function main() {
   const inputPath = path.resolve(args.in || 'exports/participants.json');
   const outputPath = path.resolve(args.out || 'exports/trials.csv');
   const surveyOutPath = path.resolve(args.surveyOut || 'exports/surveys.csv');
+  const consentOutPath = path.resolve(args.consentOut || 'exports/consent-visits.csv');
 
   if (!fs.existsSync(inputPath)) {
     throw new Error(`Input file not found: ${inputPath}`);
@@ -236,10 +273,34 @@ function main() {
   ];
   writeCsv(surveyOutPath, surveyHeaders, surveyRows);
 
+  const consentRows = flattenConsentVisits(documents);
+  const consentHeaders = [
+    'participantId',
+    'visitId',
+    'consentParticipantId',
+    'consentTimestampIso',
+    'consentSignature',
+    'hasConsent',
+    'trialsMouseOnlyCount',
+    'trialsHeadMouseCount',
+    'totalTrialsCount',
+    'hasSurveyMouseOnly',
+    'surveyMouseOnlyTimestampIso',
+    'hasSurveyHeadMouse',
+    'surveyHeadMouseTimestampIso',
+    'hasSurveyFinal',
+    'surveyFinalTimestampIso',
+    'completedBothConditions',
+    'completedAllSurveys'
+  ];
+  writeCsv(consentOutPath, consentHeaders, consentRows);
+
   console.log(`Trial CSV written: ${outputPath}`);
   console.log(`Trial rows: ${trialRows.length}`);
   console.log(`Survey CSV written: ${surveyOutPath}`);
   console.log(`Survey rows: ${surveyRows.length}`);
+  console.log(`Consent/visit CSV written: ${consentOutPath}`);
+  console.log(`Consent/visit rows: ${consentRows.length}`);
 }
 
 try {
